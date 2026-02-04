@@ -184,6 +184,43 @@ void FromFileToWaveAudioProcessor::setStateInformation (const void* data, int si
 }
 
 //==============================================================================
+bool FromFileToWaveAudioProcessor::loadWaveTableFromFile(
+    const juce::File& file,
+    WaveTableFileReader::BitDepth bitDepth,
+    int tableSize,
+    int numTables)
+{
+    WaveTableFileReader::Config config;
+    config.bitDepth = bitDepth;
+    config.tableSize = tableSize;
+    config.numTables = numTables;
+    
+    bool success = waveTableReader.loadFile(file, config);
+    
+    if (success)
+    {
+        DBG("Successfully loaded wave tables from: " << file.getFullPathName());
+        DBG("Tables: " << numTables << ", Table size: " << tableSize << ", Bit depth: " << (int)bitDepth);
+    }
+    else
+    {
+        DBG("Failed to load wave tables: " << waveTableReader.getLastError());
+    }
+    
+    return success;
+}
+
+const std::vector<std::vector<float>>& FromFileToWaveAudioProcessor::getWaveTables() const
+{
+    return waveTableReader.getWaveTables();
+}
+
+bool FromFileToWaveAudioProcessor::hasWaveTablesLoaded() const
+{
+    return waveTableReader.isLoaded();
+}
+
+//==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {

@@ -9,6 +9,7 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "WaveTableFileReader.h"
 
 //==============================================================================
 /**
@@ -52,8 +53,19 @@ public:
     //==============================================================================
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+    
+    //==============================================================================
+    bool loadWaveTableFromFile(const juce::File& file, 
+                                WaveTableFileReader::BitDepth bitDepth,
+                                int tableSize, 
+                                int numTables);
+    
+    const std::vector<std::vector<float>>& getWaveTables() const;
+    bool hasWaveTablesLoaded() const;
 
 private:
+    WaveTableFileReader waveTableReader;
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FromFileToWaveAudioProcessor)
 };

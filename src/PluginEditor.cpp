@@ -13,24 +13,32 @@
 FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFileToWaveAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    // Make sure that before the constructor has finished, you've set the
-    // editor's size to whatever you need it to be.
-    setSize (400, 300);
+    setSize (800, 600);
+
+    mFileScanSlider.setSliderStyle(Slider::LinearBarVertical);
+    mFileScanSlider.setRange(0.0, 1.0, 0.0);
+    mFileScanSlider.setBounds(20, 20, 60, 300);
+
+    addAndMakeVisible(&mFileScanSlider);
 }
+
 
 FromFileToWaveAudioProcessorEditor::~FromFileToWaveAudioProcessorEditor()
 {
 }
 
+void FromFileToWaveAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)
+{
+
+}
+
 //==============================================================================
 void FromFileToWaveAudioProcessorEditor::paint (juce::Graphics& g)
 {
-    // (Our component is opaque, so we must completely fill the background with a solid colour)
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
-
     g.setColour (juce::Colours::white);
-    g.setFont (juce::FontOptions (15.0f));
-    g.drawFittedText ("Hello World!", getLocalBounds(), juce::Justification::centred, 1);
+
+
 }
 
 void FromFileToWaveAudioProcessorEditor::resized()

@@ -15,9 +15,9 @@ FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFile
 {
     setSize (800, 600);
 
-    mFileScanSlider.setSliderStyle(Slider::LinearBarVertical);
+    mFileScanSlider.setSliderStyle(Slider::LinearHorizontal);
     mFileScanSlider.setRange(0.0, 1.0, 0.0);
-    mFileScanSlider.setBounds(20, 20, 60, 300);
+    mFileScanSlider.setBounds(20, 20, 700, 80);
 
     addAndMakeVisible(&mFileScanSlider);
 }

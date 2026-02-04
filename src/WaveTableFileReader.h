@@ -26,16 +26,16 @@ public:
     
     bool loadFile(const juce::File& file, const Config& config);
     
-    const std::vector<std::vector<float>>& getWaveTables() const { return waveTables; }
+    const std::vector<std::vector<double>>& getWaveTables() const { return waveTables; }
     
     bool isLoaded() const { return !waveTables.empty(); }
     
     juce::String getLastError() const { return lastError; }
     
 private:
-    std::vector<std::vector<float>> waveTables;
+    std::vector<std::vector<double>> waveTables;
     juce::String lastError;
     
-    float convertSampleToFloat(const uint8* bytes, BitDepth bitDepth);
+    double convertSampleToDouble(const uint8* bytes, BitDepth bitDepth);
     int getBytesPerSample(BitDepth bitDepth) const;
 };

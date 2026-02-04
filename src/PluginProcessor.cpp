@@ -8,6 +8,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "WaveTableFileReader.h"
 
 //==============================================================================
 FromFileToWaveAudioProcessor::FromFileToWaveAudioProcessor()
@@ -19,9 +20,12 @@ FromFileToWaveAudioProcessor::FromFileToWaveAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ), mOsc(700, 44100, mWaveTableReader)
 #endif
 {
+    juce::File file {"/Users/christiantronhjem/dev/JuceProjects/FromFileToWave/data/testFile.txt"};
+    WaveTableFileReader::Config conf {WaveTableFileReader::BitDepth::Bit16, 1024, 3};
+    mWaveTableReader.loadFile(file, conf);
 }
 
 FromFileToWaveAudioProcessor::~FromFileToWaveAudioProcessor()
@@ -135,26 +139,15 @@ void FromFileToWaveAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
+    const std::vector<std::vector<double>>& table = mWaveTableReader.getWaveTables();
+    for (int channel = 0; channel < 1; ++channel)
     {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
+        float* channelData = buffer.getWritePointer (channel);
+        const int numSamples = buffer.getNumSamples();
+        for (int sample = 0; sample < numSamples; ++sample)
+        {
+            channelData[sample] = mOsc.getNextSample(0);
+        }
     }
 }
 
@@ -195,7 +188,7 @@ bool FromFileToWaveAudioProcessor::loadWaveTableFromFile(
     config.tableSize = tableSize;
     config.numTables = numTables;
     
-    bool success = waveTableReader.loadFile(file, config);
+    bool success = mWaveTableReader.loadFile(file, config);
     
     if (success)
     {
@@ -210,14 +203,14 @@ bool FromFileToWaveAudioProcessor::loadWaveTableFromFile(
     return success;
 }
 
-const std::vector<std::vector<float>>& FromFileToWaveAudioProcessor::getWaveTables() const
+const std::vector<std::vector<double>>& FromFileToWaveAudioProcessor::getWaveTables() const
 {
-    return waveTableReader.getWaveTables();
+    return mWaveTableReader.getWaveTables();
 }
 
 bool FromFileToWaveAudioProcessor::hasWaveTablesLoaded() const
 {
-    return waveTableReader.isLoaded();
+    return mWaveTableReader.isLoaded();
 }
 
 //==============================================================================

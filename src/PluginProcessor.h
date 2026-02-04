@@ -10,6 +10,7 @@
 
 #include <JuceHeader.h>
 #include "WaveTableFileReader.h"
+#include "WaveTableOsc.h"
 
 //==============================================================================
 /**
@@ -60,11 +61,12 @@ public:
                                 int tableSize, 
                                 int numTables);
     
-    const std::vector<std::vector<float>>& getWaveTables() const;
+    const std::vector<std::vector<double>>& getWaveTables() const;
     bool hasWaveTablesLoaded() const;
 
 private:
-    WaveTableFileReader waveTableReader;
+    WaveTableOsc mOsc;
+    WaveTableFileReader mWaveTableReader;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FromFileToWaveAudioProcessor)

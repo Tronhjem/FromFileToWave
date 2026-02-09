@@ -10,6 +10,13 @@
           file="src/PluginProcessor.cpp"/>
     <FILE id="tO4WqA" name="PluginProcessor.h" compile="0" resource="0"
           file="src/PluginProcessor.h"/>
+    <FILE id="NhQNsq" name="WaveTableFileReader.cpp" compile="1" resource="0"
+          file="src/WaveTableFileReader.cpp"/>
+    <FILE id="Esl6dm" name="WaveTableFileReader.h" compile="0" resource="0"
+          file="src/WaveTableFileReader.h"/>
+    <FILE id="m2OuHO" name="WaveTableOsc.cpp" compile="1" resource="0"
+          file="src/WaveTableOsc.cpp"/>
+    <FILE id="HI4t26" name="WaveTableOsc.h" compile="0" resource="0" file="src/WaveTableOsc.h"/>
   </MAINGROUP>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>

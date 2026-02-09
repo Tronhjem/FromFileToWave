@@ -20,12 +20,9 @@ FromFileToWaveAudioProcessor::FromFileToWaveAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ), mOsc(700, 44100, mWaveTableReader)
+                       ), mOsc(50, 48000)
 #endif
 {
-    juce::File file {"/Users/christiantronhjem/dev/JuceProjects/FromFileToWave/data/testFile.txt"};
-    WaveTableFileReader::Config conf {WaveTableFileReader::BitDepth::Bit16, 1024, 3};
-    mWaveTableReader.loadFile(file, conf);
 }
 
 FromFileToWaveAudioProcessor::~FromFileToWaveAudioProcessor()
@@ -97,8 +94,7 @@ void FromFileToWaveAudioProcessor::changeProgramName (int index, const juce::Str
 //==============================================================================
 void FromFileToWaveAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    mSampleRate = sampleRate;
 }
 
 void FromFileToWaveAudioProcessor::releaseResources()
@@ -138,15 +134,16 @@ void FromFileToWaveAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     juce::ScopedNoDenormals noDenormals;
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
-
-    const std::vector<std::vector<double>>& table = mWaveTableReader.getWaveTables();
+    
+    mOsc.setFrequency(50, static_cast<int>(mSampleRate));
+    
     for (int channel = 0; channel < 1; ++channel)
     {
         float* channelData = buffer.getWritePointer (channel);
         const int numSamples = buffer.getNumSamples();
         for (int sample = 0; sample < numSamples; ++sample)
         {
-            channelData[sample] = mOsc.getNextSample(0);
+            channelData[sample] = mOsc.getNextSample(mWaveScan);
         }
     }
 }
@@ -176,44 +173,7 @@ void FromFileToWaveAudioProcessor::setStateInformation (const void* data, int si
     // whose contents will have been created by the getStateInformation() call.
 }
 
-//==============================================================================
-bool FromFileToWaveAudioProcessor::loadWaveTableFromFile(
-    const juce::File& file,
-    WaveTableFileReader::BitDepth bitDepth,
-    int tableSize,
-    int numTables)
-{
-    WaveTableFileReader::Config config;
-    config.bitDepth = bitDepth;
-    config.tableSize = tableSize;
-    config.numTables = numTables;
-    
-    bool success = mWaveTableReader.loadFile(file, config);
-    
-    if (success)
-    {
-        DBG("Successfully loaded wave tables from: " << file.getFullPathName());
-        DBG("Tables: " << numTables << ", Table size: " << tableSize << ", Bit depth: " << (int)bitDepth);
-    }
-    else
-    {
-        DBG("Failed to load wave tables: " << waveTableReader.getLastError());
-    }
-    
-    return success;
-}
 
-const std::vector<std::vector<double>>& FromFileToWaveAudioProcessor::getWaveTables() const
-{
-    return mWaveTableReader.getWaveTables();
-}
-
-bool FromFileToWaveAudioProcessor::hasWaveTablesLoaded() const
-{
-    return mWaveTableReader.isLoaded();
-}
-
-//==============================================================================
 // This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {

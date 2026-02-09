@@ -1,38 +1,37 @@
 
 #pragma once
 
-#include <array>
 #include "WaveTableFileReader.h"
+
+// constexpr int TableSize = 1024;
+// constexpr int HalfTableSize = TableSize / 2;
+// constexpr int QuaterTableSize = TableSize / 4;
+// constexpr int NumOfTables = 3; 
+// constexpr int WaveTableSize = TableSize * NumOfTables;
+constexpr double twoPi = 6.283185307179586;
+
 class WaveTableOsc
 {
 public:
-    WaveTableOsc(const float freq, const int sampleRate, const WaveTableFileReader& reader) 
-            : mFrequency(freq), mSampleRate(sampleRate), mWaveReader(reader)
-    { 
-        mDelta = freq / static_cast<float>(sampleRate);
+    WaveTableOsc(const float freq, const int sampleRate);
+    ~WaveTableOsc() = default;
 
-
-        // Fill test osc
-        const double twoPi = 6.283185307179586;
-        for (int i = 0; i < mTestOsc.size(); ++i)
-        {
-            mTestOsc[i] = (float)sin((twoPi * static_cast<double>(i)) / static_cast<float>(mTestOsc.size()));
-        }
-    }
-
-    double getNextSample(const float index);
+    float getNextSample(const float index);
 
     void setFrequency(const float freq, int sampleRate)
     {
         mFrequency = freq;
         mSampleRate = sampleRate;
-        mDelta = freq / static_cast<float>(sampleRate);
     }
 
 private:
+    WaveTableOsc() = delete;
+
+    inline float lerp(float a, float b, float t);
+
     float mFrequency;
     float mDelta;
     int mSampleRate;
-    std::array<float, 1024> mTestOsc;
-    const WaveTableFileReader& mWaveReader;
+    // std::array<float, WaveTableSize> mTestOsc;
+    WaveTableFileReader mWaveReader;
 };

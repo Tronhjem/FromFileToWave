@@ -3,3 +3,6 @@ build/
 Builds/
 JuceLibraryCode/
 .cache/
+*.wav
+*.png
+*.jpg

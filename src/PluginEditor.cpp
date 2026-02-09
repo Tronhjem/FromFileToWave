@@ -15,9 +15,11 @@ FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFile
 {
     setSize (800, 600);
 
-    mFileScanSlider.setSliderStyle(Slider::LinearHorizontal);
+    mFileScanSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     mFileScanSlider.setRange(0.0, 1.0, 0.0);
     mFileScanSlider.setBounds(20, 20, 700, 80);
+
+    mFileScanSlider.addListener(this);
 
     addAndMakeVisible(&mFileScanSlider);
 }
@@ -29,7 +31,10 @@ FromFileToWaveAudioProcessorEditor::~FromFileToWaveAudioProcessorEditor()
 
 void FromFileToWaveAudioProcessorEditor::sliderValueChanged(juce::Slider* slider)
 {
-
+    if (slider == &mFileScanSlider)
+    {
+        audioProcessor.mWaveScan = static_cast<float>(slider->getValue());
+    }
 }
 
 //==============================================================================

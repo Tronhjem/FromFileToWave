@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 #include <vector>
 
+
 class WaveTableFileReader
 {
 public:
@@ -25,17 +26,34 @@ public:
     ~WaveTableFileReader() = default;
     
     bool loadFile(const juce::File& file, const Config& config);
+    Config getConfig() const { return mLastConfig; }
     
-    const std::vector<std::vector<double>>& getWaveTables() const { return waveTables; }
+    const std::vector<std::vector<float>>& getWaveTables() const { return mWaveTables; }
     
-    bool isLoaded() const { return !waveTables.empty(); }
+    bool isLoaded() const { return !mWaveTables.empty(); }
     
-    juce::String getLastError() const { return lastError; }
+    juce::String getLastError() const { return mLastError; }
     
 private:
-    std::vector<std::vector<double>> waveTables;
-    juce::String lastError;
+    struct WavHeader
+    {
+        juce::uint16 audioFormat;
+        juce::uint16 numChannels;
+        juce::uint32 sampleRate;
+        juce::uint16 bitsPerSample;
+        juce::uint32 dataChunkSize;
+        juce::int64 dataChunkOffset;
+    };
     
-    double convertSampleToDouble(const uint8* bytes, BitDepth bitDepth);
+    std::vector<std::vector<float>> mWaveTables;
+    juce::String mLastError;
+    Config mLastConfig;
+    
+    float convertSampleToFloat(const juce::uint8* bytes, BitDepth bitDepth, bool isIEEEFloat = false);
     int getBytesPerSample(BitDepth bitDepth) const;
+    
+    bool isWavFile(juce::FileInputStream& stream);
+    bool parseWavHeader(juce::FileInputStream& stream, WavHeader& header);
+    bool loadWavFile(juce::FileInputStream& stream, const WavHeader& header, const Config& config);
+    bool loadRawFile(juce::FileInputStream& stream, const Config& config);
 };

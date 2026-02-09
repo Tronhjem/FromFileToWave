@@ -1,8 +1,16 @@
 # FromFileToWave
 
 Still very much a work in progress and still it's early stages.
+At it's core it's a wavetable synth. The idea is to be able to feed it anything, not just wave files thoough it works with that too. 
+Any file should be able to be read with a selected bit depth, table size and number of tables to be able to listen to raw files as a wavetable. 
+For now it's just the basics, reading data, interpolating the table with linear interpolation, no oversampling, anti-aliasing or anything fancy yet.
 
-The plan is to create a wave table synth that reads in any file. The reader now supports:
+## Usage
+- Select the bit depth, table size and number of tables from the menu. 
+- Pick a file.
+- If it's a wave file, the bit depth will be ignored and the one in the file will be used.
+- If it fails due to not enough data, play around with the values and press reload.
+- Use the frequency slider to change pitch and the scan slider to scan through the wavetables.
 
 ## File Format Support
 
@@ -28,4 +36,4 @@ This allows users to morph through a file and explore new timbres. These could b
 ## Future Plans
 The idea is to later have more files, in order to have a 2D map of morphing wave tables.
 
-Disclaimer: AI may have been used in this project but mostly for tedious tasks and code reviews. It's by no means a vibe coded project.
+> Disclaimer: AI may have been used in this project but mostly for tedious tasks and code reviews. It's by no means a vibe coded project.

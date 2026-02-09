@@ -55,7 +55,14 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
+    bool loadWaveTableFile(const juce::File& file, const WaveTableFileReader::Config& config);
+    juce::String getLastLoadError() const;
+    
     float mWaveScan = 0.f;
+    float mFrequency = 50.f;
+    int mBitDepth = 16;
+    int mTableSize = 2048;
+    int mNumTables = 1;
 
 private:
     double mSampleRate;

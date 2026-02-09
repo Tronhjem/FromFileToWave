@@ -23,6 +23,10 @@ public:
         mFrequency = freq;
         mSampleRate = sampleRate;
     }
+    
+    bool loadWaveTable(const juce::File& file, const WaveTableFileReader::Config& config);
+    bool isWaveTableLoaded() const { return mWaveReader.isLoaded(); }
+    juce::String getLastError() const { return mWaveReader.getLastError(); }
 
 private:
     WaveTableOsc() = delete;

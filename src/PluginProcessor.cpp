@@ -135,7 +135,7 @@ void FromFileToWaveAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     
-    mOsc.setFrequency(50, static_cast<int>(mSampleRate));
+    mOsc.setFrequency(mFrequency, static_cast<int>(mSampleRate));
     
     for (int channel = 0; channel < 1; ++channel)
     {
@@ -146,6 +146,16 @@ void FromFileToWaveAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
             channelData[sample] = mOsc.getNextSample(mWaveScan);
         }
     }
+}
+
+bool FromFileToWaveAudioProcessor::loadWaveTableFile(const juce::File& file, const WaveTableFileReader::Config& config)
+{
+    return mOsc.loadWaveTable(file, config);
+}
+
+juce::String FromFileToWaveAudioProcessor::getLastLoadError() const
+{
+    return mOsc.getLastError();
 }
 
 //==============================================================================
@@ -162,15 +172,32 @@ juce::AudioProcessorEditor* FromFileToWaveAudioProcessor::createEditor()
 //==============================================================================
 void FromFileToWaveAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    juce::XmlElement xml("FromFileToWaveSettings");
+    
+    xml.setAttribute("waveScan", mWaveScan);
+    xml.setAttribute("frequency", mFrequency);
+    xml.setAttribute("bitDepth", mBitDepth);
+    xml.setAttribute("tableSize", mTableSize);
+    xml.setAttribute("numTables", mNumTables);
+    
+    copyXmlToBinary(xml, destData);
 }
 
 void FromFileToWaveAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    std::unique_ptr<juce::XmlElement> xml(getXmlFromBinary(data, sizeInBytes));
+    
+    if (xml != nullptr)
+    {
+        if (xml->hasTagName("FromFileToWaveSettings"))
+        {
+            mWaveScan = static_cast<float>(xml->getDoubleAttribute("waveScan", 0.0));
+            mFrequency = static_cast<float>(xml->getDoubleAttribute("frequency", 50.0));
+            mBitDepth = xml->getIntAttribute("bitDepth", 16);
+            mTableSize = xml->getIntAttribute("tableSize", 2048);
+            mNumTables = xml->getIntAttribute("numTables", 1);
+        }
+    }
 }
 
 

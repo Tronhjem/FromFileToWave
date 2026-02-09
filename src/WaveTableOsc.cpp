@@ -6,31 +6,12 @@
 WaveTableOsc::WaveTableOsc(const float freq, const int sampleRate) 
             : mFrequency(freq), mDelta(0), mSampleRate(sampleRate), mWaveReader()
 {
-    // DEBUG OSC 
-    // for (int i = 0; i < TableSize; ++i)
-    // {
-    //     mTestOsc[static_cast<unsigned long>(i)] 
-    //         = 0.5f * (float)sin((twoPi * static_cast<float>(i)) / static_cast<float>(TableSize));
-    //
-    //     mTestOsc[static_cast<unsigned long>(i) + TableSize] 
-    //         = 0.5f * (float)sin((twoPi * static_cast<float>(i % HalfTableSize)) / static_cast<float>(HalfTableSize));
-    //
-    //     mTestOsc[static_cast<unsigned long>(i) + (2 * TableSize)] 
-    //         = 0.5f * (float)sin((twoPi * static_cast<float>(i % QuaterTableSize)) / static_cast<float>(QuaterTableSize));
-    // }
-    //
+}
 
-    // juce::File file {"/Users/christiantronhjem/dev/JuceProjects/FromFileToWave/data/testImgData.png"};
-    // juce::File file {"/Users/christiantronhjem/dev/JuceProjects/FromFileToWave/data/testImg.jpg"};
-    // juce::File file {"/Users/christiantronhjem/dev/JuceProjects/FromFileToWave/data/testFile.txt"};
-    
-//    juce::File file {"/Users/christiantronhjem/dev/JuceProjects/FromFileToWave/data/sineSquare16.wav"};
-    juce::File file {"/Users/christiantronhjem/dev/JuceProjects/FromFileToWave/data/sineSquare32.wav"};
-    WaveTableFileReader::Config conf {WaveTableFileReader::BitDepth::Bit8, 2048, 5};
-    
-//    juce::File file {"/Users/christiantronhjem/dev/JuceProjects/FromFileToWave/data/sineSingle.wav"};
-//    WaveTableFileReader::Config conf {WaveTableFileReader::BitDepth::Bit8, 2048, 1};
-    mWaveReader.loadFile(file, conf);
+bool WaveTableOsc::loadWaveTable(const juce::File& file, const WaveTableFileReader::Config& config)
+{
+    mDelta = 0;
+    return mWaveReader.loadFile(file, config);
 }
 
 float WaveTableOsc::lerp(float v0, float v1, float t) 

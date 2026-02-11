@@ -14,9 +14,14 @@ bool WaveTableOsc::loadWaveTable(const juce::File& file, const WaveTableFileRead
     return mWaveReader.loadFile(file, config);
 }
 
-float WaveTableOsc::lerp(float v0, float v1, float t) 
+float WaveTableOsc::lerp(float a, float b, float t) 
 {
-    return (1 - t) * v0 + t * v1;
+    return (1 - t) * a + t * b;
+}
+
+float WaveTableOsc::equalPower(float a, float b, float t) 
+{
+    return static_cast<float>(sqrt(0.5 * (1 - t)) * a + sqrt(0.5 * t) * b);
 }
 
 float WaveTableOsc::getNextSample(const float index)
@@ -50,7 +55,7 @@ float WaveTableOsc::getNextSample(const float index)
     const float upperB = tables[static_cast<unsigned long>(tableUpperIndex)][static_cast<unsigned long>(deltaUpper)];
     const float upperSample = lerp(upperA, upperB, mDelta - static_cast<float>(deltaFloor)); 
 
-    const float sample = lerp(floorSample, upperSample, tableIndex - static_cast<float>(tableFloorIndex));
+    const float sample = equalPower(floorSample, upperSample, tableIndex - static_cast<float>(tableFloorIndex));
 
     mDelta += delta;
     if (mDelta > static_cast<float>(tableSize))

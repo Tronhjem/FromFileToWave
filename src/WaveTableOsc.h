@@ -32,6 +32,7 @@ private:
     WaveTableOsc() = delete;
 
     inline float lerp(float a, float b, float t);
+    inline float equalPower(float a, float b, float t);
 
     float mFrequency;
     float mDelta;

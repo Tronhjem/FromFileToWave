@@ -28,6 +28,7 @@ public:
     bool loadFile(const juce::File& file, const Config& config);
     Config getConfig() const { return mLastConfig; }
     
+    //TODO: Not thread safe, implement a pointer swap and lock.
     const std::vector<std::vector<float>>& getWaveTables() const { return mWaveTables; }
     
     bool isLoaded() const { return !mWaveTables.empty(); }

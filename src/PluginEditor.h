@@ -32,6 +32,7 @@ public:
     void resized() override;
 
 private:
+    void loadFile(juce::File file);
     FromFileToWaveAudioProcessor& audioProcessor;
     
     juce::File mFile;

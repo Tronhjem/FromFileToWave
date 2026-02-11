@@ -173,7 +173,7 @@ bool WaveTableFileReader::loadWavFile(juce::FileInputStream& stream, const WavHe
     
     std::vector<uint8> sampleBuffer(static_cast<size_t>(bytesPerSample * header.numChannels));
     BitDepth wavBitDepth = static_cast<BitDepth>(header.bitsPerSample);
-    bool isIEEEFloat = (header.audioFormat == 3);
+    bool isFloatWave32 = (header.audioFormat == 3);
     
     int64 sampleCount = 0;
     for (int tableIdx = 0; tableIdx < config.numTables; ++tableIdx)
@@ -197,8 +197,9 @@ bool WaveTableFileReader::loadWavFile(juce::FileInputStream& stream, const WavHe
             for (int ch = 0; ch < header.numChannels; ++ch)
             {
                 const uint8* channelData = sampleBuffer.data() + (ch * bytesPerSample);
-                monoSample += convertSampleToFloat(channelData, wavBitDepth, isIEEEFloat);
+                monoSample += convertSampleToFloat(channelData, wavBitDepth, isFloatWave32);
             }
+            // TODO: implement an equal power sum here instead of avg.
             monoSample /= static_cast<float>(header.numChannels);
             
             mWaveTables[static_cast<unsigned long>(tableIdx)][static_cast<unsigned long>(sampleIdx)] = monoSample;
@@ -258,6 +259,7 @@ bool WaveTableFileReader::loadRawFile(juce::FileInputStream& stream, const Confi
 
 bool WaveTableFileReader::loadFile(const juce::File& file, const Config& config)
 {
+    //TODO: Not thread safe, implement a pointer swap and lock.
     mWaveTables.clear();
     mLastError.clear();
 

@@ -13,7 +13,7 @@
 FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFileToWaveAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    setSize (600, 400);
+    setSize (800, 600);
 
     mBitDepthLabel.setText("Bit Depth:", juce::dontSendNotification);
     mBitDepthLabel.setJustificationType(juce::Justification::centredRight);
@@ -131,24 +131,45 @@ void FromFileToWaveAudioProcessorEditor::comboBoxChanged(juce::ComboBox* comboBo
     }
 }
 
+void FromFileToWaveAudioProcessorEditor::loadFile(juce::File file)
+{
+    WaveTableFileReader::BitDepth bitDepth = static_cast<WaveTableFileReader::BitDepth>(audioProcessor.mBitDepth);
+    WaveTableFileReader::Config config{bitDepth, audioProcessor.mTableSize, audioProcessor.mNumTables};
+
+    bool success = audioProcessor.loadWaveTableFile(file, config);
+    mFile = file;
+
+    if (success)
+    {
+        mStatusLabel.setText("Loaded: " + file.getFileName(), juce::dontSendNotification);
+        mStatusLabel.setColour(juce::Label::textColourId, juce::Colours::green);
+    }
+    else
+    {
+        juce::String error = audioProcessor.getLastLoadError();
+        mStatusLabel.setText("Error: " + error, juce::dontSendNotification);
+        mStatusLabel.setColour(juce::Label::textColourId, juce::Colours::red);
+    }
+}
+
 void FromFileToWaveAudioProcessorEditor::buttonClicked(juce::Button* button)
 {
     if (button == &mLoadFileButton)
     {
         int numTables = mNumTablesEditor.getText().getIntValue();
+
         if (numTables < 1 || numTables > 999)
         {
             mStatusLabel.setText("Error: Number of tables must be 1-999", juce::dontSendNotification);
             mStatusLabel.setColour(juce::Label::textColourId, juce::Colours::red);
             return;
         }
+
         audioProcessor.mNumTables = numTables;
-        
         auto chooserFlags = juce::FileBrowserComponent::openMode | juce::FileBrowserComponent::canSelectFiles;
         
         mFileChooser = std::make_unique<juce::FileChooser>("Select a wavetable file...",
-                                                             juce::File(),
-                                                             "*.wav;*.raw");
+                                                             juce::File());
         
         mFileChooser->launchAsync(chooserFlags, [this](const juce::FileChooser& chooser)
         {
@@ -156,30 +177,15 @@ void FromFileToWaveAudioProcessorEditor::buttonClicked(juce::Button* button)
             
             if (file == juce::File{})
                 return;
-            
-            WaveTableFileReader::BitDepth bitDepth = static_cast<WaveTableFileReader::BitDepth>(audioProcessor.mBitDepth);
-            WaveTableFileReader::Config config{bitDepth, audioProcessor.mTableSize, audioProcessor.mNumTables};
-            
-            bool success = audioProcessor.loadWaveTableFile(file, config);
-            mFile = file;
-            
-            if (success)
-            {
-                mStatusLabel.setText("Loaded: " + file.getFileName(), juce::dontSendNotification);
-                mStatusLabel.setColour(juce::Label::textColourId, juce::Colours::green);
-            }
-            else
-            {
-                juce::String error = audioProcessor.getLastLoadError();
-                mStatusLabel.setText("Error: " + error, juce::dontSendNotification);
-                mStatusLabel.setColour(juce::Label::textColourId, juce::Colours::red);
-            }
+
+            loadFile(file);
         });
     }
     
     else if (button == &mReloadButton)
     {
         int numTables = mNumTablesEditor.getText().getIntValue();
+
         if (numTables < 1 || numTables > 999)
         {
             mStatusLabel.setText("Error: Number of tables must be 1-999", juce::dontSendNotification);
@@ -188,21 +194,7 @@ void FromFileToWaveAudioProcessorEditor::buttonClicked(juce::Button* button)
         }
         
         audioProcessor.mNumTables = numTables;
-        WaveTableFileReader::BitDepth bitDepth = static_cast<WaveTableFileReader::BitDepth>(audioProcessor.mBitDepth);
-        WaveTableFileReader::Config config{bitDepth, audioProcessor.mTableSize, audioProcessor.mNumTables};
-        bool success = audioProcessor.loadWaveTableFile(mFile, config);
-        
-        if (success)
-        {
-            mStatusLabel.setText("Loaded: " + mFile.getFileName(), juce::dontSendNotification);
-            mStatusLabel.setColour(juce::Label::textColourId, juce::Colours::green);
-        }
-        else
-        {
-            juce::String error = audioProcessor.getLastLoadError();
-            mStatusLabel.setText("Error: " + error, juce::dontSendNotification);
-            mStatusLabel.setColour(juce::Label::textColourId, juce::Colours::red);
-        }
+        loadFile(mFile);
     }
 }
 

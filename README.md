@@ -35,5 +35,3 @@ This allows users to morph through a file and explore new timbres. These could b
 
 ## Future Plans
 The idea is to later have more files, in order to have a 2D map of morphing wave tables.
-
-> Disclaimer: AI may have been used in this project but mostly for tedious tasks and code reviews. It's by no means a vibe coded project.

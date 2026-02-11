@@ -7,7 +7,7 @@ For now it's just the basics, reading data, interpolating the table with linear 
 
 ## Usage
 - Select the bit depth, table size and number of tables from the menu. 
-- Pick a file.
+- Click the load button to pick a file.
 - If it's a wave file, the bit depth will be ignored and the one in the file will be used.
 - If it fails due to not enough data, play around with the values and press reload.
 - Use the frequency slider to change pitch and the scan slider to scan through the wavetables.

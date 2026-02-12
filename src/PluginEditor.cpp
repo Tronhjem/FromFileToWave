@@ -13,7 +13,7 @@
 FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFileToWaveAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    setSize (800, 600);
+    setSize(800, 600);
 
     mBitDepthLabel.setText("Bit Depth:", juce::dontSendNotification);
     mBitDepthLabel.setJustificationType(juce::Justification::centredRight);
@@ -133,7 +133,7 @@ void FromFileToWaveAudioProcessorEditor::comboBoxChanged(juce::ComboBox* comboBo
 
 void FromFileToWaveAudioProcessorEditor::loadFile(juce::File file)
 {
-    WaveTableFileReader::BitDepth bitDepth = static_cast<WaveTableFileReader::BitDepth>(audioProcessor.mBitDepth);
+   WaveTableFileReader::BitDepth bitDepth = static_cast<WaveTableFileReader::BitDepth>(audioProcessor.mBitDepth);
     WaveTableFileReader::Config config{bitDepth, audioProcessor.mTableSize, audioProcessor.mNumTables};
 
     bool success = audioProcessor.loadWaveTableFile(file, config);
@@ -203,48 +203,48 @@ void FromFileToWaveAudioProcessorEditor::paint (juce::Graphics& g)
 {
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));
     g.setColour (juce::Colours::white);
-
-
 }
 
 void FromFileToWaveAudioProcessorEditor::resized()
 {
-    auto bounds = getLocalBounds().reduced(20);
+    constexpr int rowHeight = 30;
+    constexpr int rowMargin = 10;
+    Rectangle bounds = getLocalBounds().reduced(20);
     
-    auto fileSection = bounds.removeFromTop(200);
+    Rectangle fileSection = bounds.removeFromTop(200);
     
-    auto row1 = fileSection.removeFromTop(30);
+    Rectangle row1 = fileSection.removeFromTop(rowHeight);
     mBitDepthLabel.setBounds(row1.removeFromLeft(100));
     mBitDepthCombo.setBounds(row1.removeFromLeft(120));
     
-    fileSection.removeFromTop(10);
-    auto row2 = fileSection.removeFromTop(30);
+    fileSection.removeFromTop(rowMargin);
+    Rectangle row2 = fileSection.removeFromTop(rowHeight);
     mTableSizeLabel.setBounds(row2.removeFromLeft(100));
     mTableSizeCombo.setBounds(row2.removeFromLeft(120));
     
-    fileSection.removeFromTop(10);
-    auto row3 = fileSection.removeFromTop(30);
+    fileSection.removeFromTop(rowMargin);
+    Rectangle row3 = fileSection.removeFromTop(rowHeight);
     mNumTablesLabel.setBounds(row3.removeFromLeft(100));
     mNumTablesEditor.setBounds(row3.removeFromLeft(120));
     
-    fileSection.removeFromTop(10);
-    auto row4 = fileSection.removeFromTop(30);
+    fileSection.removeFromTop(rowMargin);
+    Rectangle row4 = fileSection.removeFromTop(rowHeight);
     mLoadFileButton.setBounds(row4.removeFromLeft(220).reduced(0, 2));
     
-    fileSection.removeFromTop(10);
-    auto row5 = fileSection.removeFromTop(30);
+    fileSection.removeFromTop(rowMargin);
+    Rectangle row5 = fileSection.removeFromTop(rowHeight);
     mReloadButton.setBounds(row5.removeFromLeft(220).reduced(0, 2));
 
-    bounds.removeFromTop(10);
+    bounds.removeFromTop(rowMargin);
     mStatusLabel.setBounds(bounds.removeFromTop(25));
     
     bounds.removeFromTop(20);
-    auto freqRow = bounds.removeFromTop(30);
+    Rectangle freqRow = bounds.removeFromTop(rowHeight);
     mFrequencyLabel.setBounds(freqRow.removeFromLeft(100));
     mFrequencySlider.setBounds(freqRow);
     
-    bounds.removeFromTop(10);
-    auto scanRow = bounds.removeFromTop(30);
+    bounds.removeFromTop(rowMargin);
+    Rectangle scanRow = bounds.removeFromTop(rowHeight);
     mWaveScanLabel.setBounds(scanRow.removeFromLeft(100));
     mFileScanSlider.setBounds(scanRow);
 }

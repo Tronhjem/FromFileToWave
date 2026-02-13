@@ -166,7 +166,7 @@ bool WaveTableFileReader::loadWavFile(juce::FileInputStream& stream, const WavHe
     mWaveTables.resize(static_cast<size_t>(config.numTables));
     for (int tableIdx = 0; tableIdx < config.numTables; ++tableIdx)
     {
-        mWaveTables[static_cast<unsigned long>(tableIdx)].resize(static_cast<size_t>(config.tableSize));
+        mWaveTables[static_cast<size_t>(tableIdx)].resize(static_cast<size_t>(config.tableSize));
     }
     
     stream.setPosition(header.dataChunkOffset);
@@ -202,7 +202,7 @@ bool WaveTableFileReader::loadWavFile(juce::FileInputStream& stream, const WavHe
             // TODO: implement an equal power sum here instead of avg.
             monoSample /= static_cast<float>(header.numChannels);
             
-            mWaveTables[static_cast<unsigned long>(tableIdx)][static_cast<unsigned long>(sampleIdx)] = monoSample;
+            mWaveTables[static_cast<size_t>(tableIdx)][static_cast<size_t>(sampleIdx)] = monoSample;
             ++sampleCount;
         }
     }
@@ -230,7 +230,7 @@ bool WaveTableFileReader::loadRawFile(juce::FileInputStream& stream, const Confi
     mWaveTables.resize(static_cast<size_t>(config.numTables));
     for (int tableIdx = 0; tableIdx < config.numTables; ++tableIdx)
     {
-        mWaveTables[static_cast<unsigned long>(tableIdx)].resize(static_cast<size_t>(config.tableSize));
+        mWaveTables[static_cast<size_t>(tableIdx)].resize(static_cast<size_t>(config.tableSize));
     }
     
     std::vector<uint8> buffer(static_cast<size_t>(bytesPerSample));
@@ -249,7 +249,7 @@ bool WaveTableFileReader::loadRawFile(juce::FileInputStream& stream, const Confi
                 return false;
             }
             
-            mWaveTables[static_cast<unsigned long>(tableIdx)][static_cast<unsigned long>(sampleIdx)] 
+            mWaveTables[static_cast<size_t>(tableIdx)][static_cast<size_t>(sampleIdx)] 
                 = convertSampleToFloat(buffer.data(), config.bitDepth);
         }
     }

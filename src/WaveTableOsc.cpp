@@ -49,12 +49,12 @@ float WaveTableOsc::getNextSample(const float index)
     const int deltaFloor = static_cast<int>(floor(mDelta));
     const int deltaUpper = (deltaFloor + 1) & tableSizeMask;
     
-    const float floorA = tables[static_cast<unsigned long>(tableFloorIndex)][static_cast<unsigned long>(deltaFloor)];
-    const float floorB = tables[static_cast<unsigned long>(tableFloorIndex)][static_cast<unsigned long>(deltaUpper)];
+    const float floorA = tables[static_cast<size_t>(tableFloorIndex)][static_cast<size_t>(deltaFloor)];
+    const float floorB = tables[static_cast<size_t>(tableFloorIndex)][static_cast<size_t>(deltaUpper)];
     const float floorSample = lerp(floorA, floorB, mDelta - static_cast<float>(deltaFloor)); 
 
-    const float upperA = tables[static_cast<unsigned long>(tableUpperIndex)][static_cast<unsigned long>(deltaFloor)];
-    const float upperB = tables[static_cast<unsigned long>(tableUpperIndex)][static_cast<unsigned long>(deltaUpper)];
+    const float upperA = tables[static_cast<size_t>(tableUpperIndex)][static_cast<size_t>(deltaFloor)];
+    const float upperB = tables[static_cast<size_t>(tableUpperIndex)][static_cast<size_t>(deltaUpper)];
     const float upperSample = lerp(upperA, upperB, mDelta - static_cast<float>(deltaFloor)); 
 
     const float sample = lerp(floorSample, upperSample, tableIndex - static_cast<float>(tableFloorIndex));

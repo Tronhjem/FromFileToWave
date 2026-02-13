@@ -26,7 +26,7 @@ public:
     ~WaveTableFileReader() = default;
     
     bool loadFile(const juce::File& file, const Config& config);
-    Config getConfig() const { return mLastConfig; }
+    const Config& getConfig() const { return mLastConfig; }
     
     //TODO: Not thread safe, implement a pointer swap and lock.
     const std::vector<std::vector<float>>& getWaveTables() const { return mWaveTables; }

@@ -63,5 +63,6 @@ float WaveTableOsc::getNextSample(const float index)
     if (mDelta > static_cast<float>(tableSize))
         mDelta -= static_cast<float>(tableSize);
 
+
     return sample;
 }

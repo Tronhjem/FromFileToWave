@@ -9,6 +9,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+using namespace juce;
 //==============================================================================
 FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFileToWaveAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
@@ -51,7 +52,7 @@ FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFile
     mFrequencyLabel.setJustificationType(juce::Justification::centredRight);
     
     mFrequencySlider.setSliderStyle(juce::Slider::LinearHorizontal);
-    mFrequencySlider.setRange(50.0, 1000.0, 1.0);
+    mFrequencySlider.setRange(2.0, 2000.0, 1.0);
     mFrequencySlider.setValue(audioProcessor.mFrequency);
     mFrequencySlider.setTextBoxStyle(juce::Slider::TextBoxRight, false, 60, 20);
     

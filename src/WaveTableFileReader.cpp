@@ -234,8 +234,13 @@ bool WaveTableFileReader::loadRawFile(juce::FileInputStream& stream, const Confi
     }
     
     std::vector<uint8> buffer(static_cast<size_t>(bytesPerSample));
-    
     stream.setPosition(0);
+
+    constexpr float fadeAlpha = 0.02f; // 20 samples fade at each end
+    const int fadeLength = static_cast<int>(fadeAlpha * static_cast<float>(config.tableSize) / 2.0f);
+    const int endFadeStartIndex = config.tableSize - fadeLength;
+    float gain = 1.0f;
+
     for (int tableIdx = 0; tableIdx < config.numTables; ++tableIdx)
     {
         for (int sampleIdx = 0; sampleIdx < config.tableSize; ++sampleIdx)
@@ -248,14 +253,19 @@ bool WaveTableFileReader::loadRawFile(juce::FileInputStream& stream, const Confi
                 mWaveTables.clear();
                 return false;
             }
+
+            if (sampleIdx < fadeLength)
+                gain = static_cast<float>(0.5 * (1.0 - std::cos(M_PI * sampleIdx / fadeLength)));
+            else if (sampleIdx >= endFadeStartIndex)
+                gain = static_cast<float>(0.5 * (1.0 + std::cos(M_PI * (sampleIdx - (config.tableSize - fadeLength)) / fadeLength)));
             
-            mWaveTables[static_cast<size_t>(tableIdx)][static_cast<size_t>(sampleIdx)] 
-                = convertSampleToFloat(buffer.data(), config.bitDepth);
+            const float sample = convertSampleToFloat(buffer.data(), config.bitDepth) * gain;
+            mWaveTables[static_cast<size_t>(tableIdx)][static_cast<size_t>(sampleIdx)] = sample;
         }
     }
     
     return true;
-}
+} 
 
 bool WaveTableFileReader::loadFile(const juce::File& file, const Config& config)
 {

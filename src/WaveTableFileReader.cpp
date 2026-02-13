@@ -239,7 +239,6 @@ bool WaveTableFileReader::loadRawFile(juce::FileInputStream& stream, const Confi
     constexpr float fadeAlpha = 0.02f; // 20 samples fade at each end
     const int fadeLength = static_cast<int>(fadeAlpha * static_cast<float>(config.tableSize) / 2.0f);
     const int endFadeStartIndex = config.tableSize - fadeLength;
-    float gain = 1.0f;
 
     for (int tableIdx = 0; tableIdx < config.numTables; ++tableIdx)
     {
@@ -254,6 +253,7 @@ bool WaveTableFileReader::loadRawFile(juce::FileInputStream& stream, const Confi
                 return false;
             }
 
+            float gain = 1.0f;
             if (sampleIdx < fadeLength)
                 gain = static_cast<float>(0.5 * (1.0 - std::cos(M_PI * sampleIdx / fadeLength)));
             else if (sampleIdx >= endFadeStartIndex)

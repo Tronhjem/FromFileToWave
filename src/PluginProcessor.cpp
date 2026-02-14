@@ -9,6 +9,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "WaveTableFileReader.h"
+#include "Defines.h"
 
 //==============================================================================
 FromFileToWaveAudioProcessor::FromFileToWaveAudioProcessor()
@@ -80,20 +81,25 @@ int FromFileToWaveAudioProcessor::getCurrentProgram()
 
 void FromFileToWaveAudioProcessor::setCurrentProgram (int index)
 {
+    UNUSED(index);
 }
 
 const juce::String FromFileToWaveAudioProcessor::getProgramName (int index)
 {
+    UNUSED(index);
     return {};
 }
 
 void FromFileToWaveAudioProcessor::changeProgramName (int index, const juce::String& newName)
 {
+    UNUSED(index);
+    UNUSED(newName);
 }
 
 //==============================================================================
 void FromFileToWaveAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
+    UNUSED(samplesPerBlock);
     mSampleRate = sampleRate;
 }
 
@@ -132,6 +138,8 @@ bool FromFileToWaveAudioProcessor::isBusesLayoutSupported (const BusesLayout& la
 void FromFileToWaveAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
+    UNUSED(midiMessages);
+
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     
@@ -190,10 +198,10 @@ void FromFileToWaveAudioProcessor::getStateInformation (juce::MemoryBlock& destD
     
     for (int i = 0; i < NumWaveTableSlots; ++i)
     {
-        xml.setAttribute("bitDepth" + juce::String(i), mBitDepth[i]);
-        xml.setAttribute("tableSize" + juce::String(i), mTableSize[i]);
-        xml.setAttribute("numTables" + juce::String(i), mNumTables[i]);
-        xml.setAttribute("smooth" + juce::String(i), static_cast<double>(mSmooth[i]));
+        xml.setAttribute("bitDepth" + juce::String(i), mBitDepth[static_cast<size_t>(i)]);
+        xml.setAttribute("tableSize" + juce::String(i), mTableSize[static_cast<size_t>(i)]);
+        xml.setAttribute("numTables" + juce::String(i), mNumTables[static_cast<size_t>(i)]);
+        xml.setAttribute("smooth" + juce::String(i), static_cast<double>(mSmooth[static_cast<size_t>(i)]));
     }
     
     copyXmlToBinary(xml, destData);
@@ -213,17 +221,15 @@ void FromFileToWaveAudioProcessor::setStateInformation (const void* data, int si
             
             for (int i = 0; i < NumWaveTableSlots; ++i)
             {
-                mBitDepth[i] = xml->getIntAttribute("bitDepth" + juce::String(i), 16);
-                mTableSize[i] = xml->getIntAttribute("tableSize" + juce::String(i), 2048);
-                mNumTables[i] = xml->getIntAttribute("numTables" + juce::String(i), 1);
-                mSmooth[i] = static_cast<float>(xml->getDoubleAttribute("smooth" + juce::String(i), 0.0));
+                mBitDepth[static_cast<size_t>(i)] = xml->getIntAttribute("bitDepth" + juce::String(i), 16);
+                mTableSize[static_cast<size_t>(i)] = xml->getIntAttribute("tableSize" + juce::String(i), 2048);
+                mNumTables[static_cast<size_t>(i)] = xml->getIntAttribute("numTables" + juce::String(i), 1);
+                mSmooth[static_cast<size_t>(i)] = static_cast<float>(xml->getDoubleAttribute("smooth" + juce::String(i), 0.0));
             }
         }
     }
 }
 
-
-// This creates new instances of the plugin..
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new FromFileToWaveAudioProcessor();

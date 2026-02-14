@@ -17,11 +17,6 @@ void Envelope::updateEnvelopeIncrements(const float sampleRate)
         mReleaseIncrement = 1.0f;
 }
 
-void Envelope::setState(const EnvelopeState state)
-{
-    mEnvelopeState = state;
-}
-
 float Envelope::updateEnvelope()
 {
     switch (mEnvelopeState)

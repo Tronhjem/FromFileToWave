@@ -64,7 +64,6 @@ public:
     float mYPosition = 0.f;
     float mFrequency = 440.f;
     bool mDroneMode = false;
-    bool mIsNoteOn = false;
     
     std::array<int, NumWaveTableSlots> mBitDepth = {16, 16, 16, 16, 16, 16};
     std::array<int, NumWaveTableSlots> mTableSize = {2048, 2048, 2048, 2048, 2048, 2048};
@@ -75,7 +74,6 @@ public:
 
 private:
     double mSampleRate;
-    bool mWasDroneMode;
     WaveTableOsc mWaveTableOsc;
     
     int mCurrentNote = -1;

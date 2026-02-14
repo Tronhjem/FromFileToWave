@@ -11,6 +11,7 @@
 #include "PluginEditor.h"
 #include "WaveTableFileReader.h"
 #include "Defines.h"
+#include "juce_audio_basics/juce_audio_basics.h"
 
 //==============================================================================
 FromFileToWaveAudioProcessor::FromFileToWaveAudioProcessor()
@@ -148,22 +149,10 @@ void FromFileToWaveAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     
     if (!mDroneMode)
     {
-        if (mWasDroneMode)
-        {
-            mWasDroneMode = false;
-            mIsNoteOn = false;
-            // mEnvelope.setState(EnvelopeState::Release);
-        }
-        
         for (const auto metadata : midiMessages)
         {
             processMidiMessage(metadata.getMessage());
         }
-    }
-    else if (!mWasDroneMode)
-    {
-        mWasDroneMode = true;
-        // mEnvelope.setState(EnvelopeState::Attack);
     }
     
     mWaveTableOsc.setFrequency(mFrequency, static_cast<int>(mSampleRate));
@@ -172,11 +161,13 @@ void FromFileToWaveAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     
     for (int sample = 0; sample < numSamples; ++sample)
     {
-        const float envelopeLevel = mEnvelope.updateEnvelope();
         float outputSample = 0.0f;
-        
-        outputSample = mWaveTableOsc.getNextSample(mXPosition, mYPosition);
-        outputSample *= envelopeLevel;
+        const float envelopeLevel = mEnvelope.updateEnvelope();
+
+        if (mEnvelope.getState() != EnvelopeState::Idle)
+        {
+            outputSample = mWaveTableOsc.getNextSample(mXPosition, mYPosition) * envelopeLevel;
+        }
         
         for (int channel = 0; channel < totalNumOutputChannels; ++channel)
         {
@@ -191,14 +182,12 @@ void FromFileToWaveAudioProcessor::processMidiMessage(const juce::MidiMessage& m
     {
         mCurrentNote = message.getNoteNumber();
         mFrequency = noteToFrequency(mCurrentNote);
-        mIsNoteOn = true;
         mEnvelope.setState(EnvelopeState::Attack);
     }
     else if (message.isNoteOff())
     {
         if (message.getNoteNumber() == mCurrentNote)
         {
-            mIsNoteOn = false;
             mCurrentNote = -1;
             mEnvelope.setState(EnvelopeState::Release);
         }

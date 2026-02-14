@@ -45,7 +45,6 @@ FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFile
         audioProcessor.mDroneMode = mDroneModeButton.getToggleState();
         if (audioProcessor.mDroneMode)
         {
-            audioProcessor.mIsNoteOn = true;
             audioProcessor.mEnvelope.setState(EnvelopeState::Attack);
         }
         else

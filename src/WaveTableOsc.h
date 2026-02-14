@@ -1,42 +1,32 @@
-
 #pragma once
 
-#include "WaveTableFileReader.h"
+#include <array>
+#include "WaveTable.h"
 
-// constexpr int TableSize = 1024;
-// constexpr int HalfTableSize = TableSize / 2;
-// constexpr int QuaterTableSize = TableSize / 4;
-// constexpr int NumOfTables = 3; 
-// constexpr int WaveTableSize = TableSize * NumOfTables;
-constexpr double twoPi = 6.283185307179586;
+constexpr int NumWaveTableSlots = 6;
 
 class WaveTableOsc
 {
 public:
-    WaveTableOsc(const float freq, const int sampleRate);
+    WaveTableOsc(float freq, int sampleRate);
     ~WaveTableOsc() = default;
 
-    float getNextSample(const float index);
-
-    void setFrequency(const float freq, int sampleRate)
-    {
-        mFrequency = freq;
-        mSampleRate = sampleRate;
-    }
+    float getNextSample(float xIndex, float yIndex);
     
-    bool loadWaveTable(const juce::File& file, const WaveTableFileReader::Config& config);
-    bool isWaveTableLoaded() const { return mWaveReader.isLoaded(); }
-    juce::String getLastError() const { return mWaveReader.getLastError(); }
+    void setFrequency(float freq, int sampleRate);
+    
+    bool loadWaveTableFile(int slot, const juce::File& file, const WaveTableFileReader::Config& config);
+    
+    bool isSlotLoaded(int slot) const;
+    juce::String getSlotError(int slot) const;
 
 private:
     WaveTableOsc() = delete;
-
+    
     inline float lerp(float a, float b, float t);
-    inline float equalPower(float a, float b, float t);
-
+    
     float mFrequency;
-    float mDelta;
     int mSampleRate;
-    // std::array<float, WaveTableSize> mTestOsc;
-    WaveTableFileReader mWaveReader;
+    float mDelta;
+    std::array<WaveTable, NumWaveTableSlots> mOscillators;
 };

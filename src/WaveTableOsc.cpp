@@ -1,68 +1,74 @@
 
-#include <cmath>
-#include <cassert>
 #include "WaveTableOsc.h"
-#include "WaveTableFileReader.h"
 
-WaveTableOsc::WaveTableOsc(const float freq, const int sampleRate) 
-            : mFrequency(freq), mDelta(0), mSampleRate(sampleRate), mWaveReader()
+WaveTableOsc::WaveTableOsc(float freq, int sampleRate)
+    : mFrequency(freq)
+    , mSampleRate(sampleRate)
+    , mDelta(0.0f)
 {
 }
 
-bool WaveTableOsc::loadWaveTable(const juce::File& file, const WaveTableFileReader::Config& config)
+float WaveTableOsc::lerp(float a, float b, float t)
 {
-    mDelta = 0;
-    return mWaveReader.loadFile(file, config);
+    return a + t * (b - a);
 }
 
-float WaveTableOsc::lerp(float a, float b, float t) 
+float WaveTableOsc::getNextSample(float xIndex, float yIndex)
 {
-    return (1 - t) * a + t * b;
-}
-
-float WaveTableOsc::equalPower(float a, float b, float t) 
-{
-    return static_cast<float>(sqrt(0.5 * (1 - t)) * a + sqrt(0.5 * t) * b);
-}
-
-float WaveTableOsc::getNextSample(const float index)
-{
-    if (!mWaveReader.isLoaded())
-        return 0.f;
-
-    const std::vector<std::vector<float>>& tables = mWaveReader.getWaveTables();
-
-    WaveTableFileReader::Config waveConfig = mWaveReader.getConfig();
-    const int maxTableIndex = waveConfig.numTables - 1;
-    const int tableSize = waveConfig.tableSize;
-    const int tableSizeMask = waveConfig.tableSize - 1;
+    yIndex = std::clamp(yIndex, 0.0f, 1.0f);
     
-#if _DEBUG
-    assert((tableSize > 0) && ((tableSize & (tableSize - 1)) == 0) && "n must be a power of two");
-#endif
-
-    const float tableIndex = index * static_cast<float>(maxTableIndex);
-    const int tableFloorIndex = static_cast<int>(floor(tableIndex));
-    const int tableUpperIndex = std::min(tableFloorIndex + 1, maxTableIndex);
-
-    const float delta = (mFrequency / static_cast<float>(mSampleRate)) * static_cast<float>(tableSize);
-    const int deltaFloor = static_cast<int>(floor(mDelta));
-    const int deltaUpper = (deltaFloor + 1) & tableSizeMask;
+    const float yScaled = yIndex * (NumWaveTableSlots - 1);
+    const int yFloor = static_cast<int>(std::floor(yScaled));
+    const int yUpper = std::min(yFloor + 1, NumWaveTableSlots - 1);
+    const float yFrac = yScaled - static_cast<float>(yFloor);
     
-    const float floorA = tables[static_cast<size_t>(tableFloorIndex)][static_cast<size_t>(deltaFloor)];
-    const float floorB = tables[static_cast<size_t>(tableFloorIndex)][static_cast<size_t>(deltaUpper)];
-    const float floorSample = lerp(floorA, floorB, mDelta - static_cast<float>(deltaFloor)); 
+    float sampleLower = 0.0f;
+    float sampleUpper = 0.0f;
+    
+    if (mOscillators[yFloor].isWaveTableLoaded())
+    {
+        sampleLower = mOscillators[yFloor].getSample(mDelta, xIndex);
+    }
+    
+    if (mOscillators[yUpper].isWaveTableLoaded())
+    {
+        sampleUpper = mOscillators[yUpper].getSample(mDelta, xIndex);
+    }
 
-    const float upperA = tables[static_cast<size_t>(tableUpperIndex)][static_cast<size_t>(deltaFloor)];
-    const float upperB = tables[static_cast<size_t>(tableUpperIndex)][static_cast<size_t>(deltaUpper)];
-    const float upperSample = lerp(upperA, upperB, mDelta - static_cast<float>(deltaFloor)); 
+    const float phaseIncrement = (mFrequency / static_cast<float>(mSampleRate)) * 2048.0f;
+    mDelta += phaseIncrement;
+    if (mDelta >= 2048.0f)
+        mDelta -= 2048.0f;
 
-    const float sample = lerp(floorSample, upperSample, tableIndex - static_cast<float>(tableFloorIndex));
+    return lerp(sampleLower, sampleUpper, yFrac);
+}
 
-    mDelta += delta;
-    if (mDelta > static_cast<float>(tableSize))
-        mDelta -= static_cast<float>(tableSize);
+void WaveTableOsc::setFrequency(float freq, int sampleRate)
+{
+    mFrequency = freq;
+    mSampleRate = sampleRate;
+}
 
+bool WaveTableOsc::loadWaveTableFile(int slot, const juce::File& file, const WaveTableFileReader::Config& config)
+{
+    if (slot < 0 || slot >= NumWaveTableSlots)
+        return false;
+    
+    return mOscillators[slot].loadWaveTable(file, config);
+}
 
-    return sample;
+bool WaveTableOsc::isSlotLoaded(int slot) const
+{
+    if (slot < 0 || slot >= NumWaveTableSlots)
+        return false;
+    
+    return mOscillators[slot].isWaveTableLoaded();
+}
+
+juce::String WaveTableOsc::getSlotError(int slot) const
+{
+    if (slot < 0 || slot >= NumWaveTableSlots)
+        return "Invalid slot index";
+    
+    return mOscillators[slot].getLastError();
 }

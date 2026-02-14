@@ -9,7 +9,6 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "WaveTableFileReader.h"
 #include "WaveTableOsc.h"
 
 //==============================================================================
@@ -55,18 +54,20 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
     
-    bool loadWaveTableFile(const juce::File& file, const WaveTableFileReader::Config& config);
-    juce::String getLastLoadError() const;
+    bool loadWaveTableFile(int slot, const juce::File& file, const WaveTableFileReader::Config& config);
+    juce::String getSlotError(int slot) const;
+    bool isSlotLoaded(int slot) const;
     
-    float mWaveScan = 0.f;
+    float mXPosition = 0.f;
+    float mYPosition = 0.f;
     float mFrequency = 50.f;
-    int mBitDepth = 16;
-    int mTableSize = 2048;
-    int mNumTables = 1;
+    std::array<int, NumWaveTableSlots> mBitDepth = {16, 16, 16, 16, 16, 16};
+    std::array<int, NumWaveTableSlots> mTableSize = {2048, 2048, 2048, 2048, 2048, 2048};
+    std::array<int, NumWaveTableSlots> mNumTables = {1, 1, 1, 1, 1, 1};
 
 private:
     double mSampleRate;
-    WaveTableOsc mOsc;
+    WaveTableOsc mWaveTableOsc;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FromFileToWaveAudioProcessor)

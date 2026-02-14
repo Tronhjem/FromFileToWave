@@ -20,7 +20,7 @@ FromFileToWaveAudioProcessor::FromFileToWaveAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ), mOsc(50, 48000)
+                       ), mWaveTableOsc(50, 48000)
 #endif
 {
 }
@@ -135,27 +135,37 @@ void FromFileToWaveAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     
-    mOsc.setFrequency(mFrequency, static_cast<int>(mSampleRate));
+    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+        buffer.clear (i, 0, buffer.getNumSamples());
     
-    for (int channel = 0; channel < 1; ++channel)
+    mWaveTableOsc.setFrequency(mFrequency, static_cast<int>(mSampleRate));
+    
+    const int numSamples = buffer.getNumSamples();
+    
+    for (int sample = 0; sample < numSamples; ++sample)
     {
-        float* channelData = buffer.getWritePointer (channel);
-        const int numSamples = buffer.getNumSamples();
-        for (int sample = 0; sample < numSamples; ++sample)
+        const float outputSample = mWaveTableOsc.getNextSample(mXPosition, mYPosition);
+        
+        for (int channel = 0; channel < totalNumOutputChannels; ++channel)
         {
-            channelData[sample] = mOsc.getNextSample(mWaveScan);
+            buffer.setSample(channel, sample, outputSample);
         }
     }
 }
 
-bool FromFileToWaveAudioProcessor::loadWaveTableFile(const juce::File& file, const WaveTableFileReader::Config& config)
+bool FromFileToWaveAudioProcessor::loadWaveTableFile(int slot, const juce::File& file, const WaveTableFileReader::Config& config)
 {
-    return mOsc.loadWaveTable(file, config);
+    return mWaveTableOsc.loadWaveTableFile(slot, file, config);
 }
 
-juce::String FromFileToWaveAudioProcessor::getLastLoadError() const
+juce::String FromFileToWaveAudioProcessor::getSlotError(int slot) const
 {
-    return mOsc.getLastError();
+    return mWaveTableOsc.getSlotError(slot);
+}
+
+bool FromFileToWaveAudioProcessor::isSlotLoaded(int slot) const
+{
+    return mWaveTableOsc.isSlotLoaded(slot);
 }
 
 //==============================================================================
@@ -174,11 +184,16 @@ void FromFileToWaveAudioProcessor::getStateInformation (juce::MemoryBlock& destD
 {
     juce::XmlElement xml("FromFileToWaveSettings");
     
-    xml.setAttribute("waveScan", mWaveScan);
+    xml.setAttribute("xPosition", mXPosition);
+    xml.setAttribute("yPosition", mYPosition);
     xml.setAttribute("frequency", mFrequency);
-    xml.setAttribute("bitDepth", mBitDepth);
-    xml.setAttribute("tableSize", mTableSize);
-    xml.setAttribute("numTables", mNumTables);
+    
+    for (int i = 0; i < NumWaveTableSlots; ++i)
+    {
+        xml.setAttribute("bitDepth" + juce::String(i), mBitDepth[i]);
+        xml.setAttribute("tableSize" + juce::String(i), mTableSize[i]);
+        xml.setAttribute("numTables" + juce::String(i), mNumTables[i]);
+    }
     
     copyXmlToBinary(xml, destData);
 }
@@ -191,11 +206,16 @@ void FromFileToWaveAudioProcessor::setStateInformation (const void* data, int si
     {
         if (xml->hasTagName("FromFileToWaveSettings"))
         {
-            mWaveScan = static_cast<float>(xml->getDoubleAttribute("waveScan", 0.0));
+            mXPosition = static_cast<float>(xml->getDoubleAttribute("xPosition", 0.0));
+            mYPosition = static_cast<float>(xml->getDoubleAttribute("yPosition", 0.0));
             mFrequency = static_cast<float>(xml->getDoubleAttribute("frequency", 50.0));
-            mBitDepth = xml->getIntAttribute("bitDepth", 16);
-            mTableSize = xml->getIntAttribute("tableSize", 2048);
-            mNumTables = xml->getIntAttribute("numTables", 1);
+            
+            for (int i = 0; i < NumWaveTableSlots; ++i)
+            {
+                mBitDepth[i] = xml->getIntAttribute("bitDepth" + juce::String(i), 16);
+                mTableSize[i] = xml->getIntAttribute("tableSize" + juce::String(i), 2048);
+                mNumTables[i] = xml->getIntAttribute("numTables" + juce::String(i), 1);
+            }
         }
     }
 }

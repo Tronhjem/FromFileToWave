@@ -10,13 +10,23 @@
           file="src/PluginProcessor.cpp"/>
     <FILE id="tO4WqA" name="PluginProcessor.h" compile="0" resource="0"
           file="src/PluginProcessor.h"/>
+    <FILE id="PMuX0k" name="WaveTable.cpp" compile="1" resource="0" file="src/WaveTable.cpp"/>
+    <FILE id="P2lmY6" name="WaveTable.h" compile="0" resource="0" file="src/WaveTable.h"/>
     <FILE id="NhQNsq" name="WaveTableFileReader.cpp" compile="1" resource="0"
           file="src/WaveTableFileReader.cpp"/>
     <FILE id="Esl6dm" name="WaveTableFileReader.h" compile="0" resource="0"
           file="src/WaveTableFileReader.h"/>
-    <FILE id="m2OuHO" name="WaveTableOsc.cpp" compile="1" resource="0"
+    <FILE id="Vt2Pj5" name="WaveTableOsc.cpp" compile="1" resource="0"
           file="src/WaveTableOsc.cpp"/>
-    <FILE id="HI4t26" name="WaveTableOsc.h" compile="0" resource="0" file="src/WaveTableOsc.h"/>
+    <FILE id="pDc0GK" name="WaveTableOsc.h" compile="0" resource="0" file="src/WaveTableOsc.h"/>
+    <FILE id="w2HvAx" name="WaveTableSlotComponent.cpp" compile="1" resource="0"
+          file="src/WaveTableSlotComponent.cpp"/>
+    <FILE id="BsthxE" name="WaveTableSlotComponent.h" compile="0" resource="0"
+          file="src/WaveTableSlotComponent.h"/>
+    <FILE id="x8ffT9" name="XYPadComponent.cpp" compile="1" resource="0"
+          file="src/XYPadComponent.cpp"/>
+    <FILE id="jBspu5" name="XYPadComponent.h" compile="0" resource="0"
+          file="src/XYPadComponent.h"/>
   </MAINGROUP>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="1"/>

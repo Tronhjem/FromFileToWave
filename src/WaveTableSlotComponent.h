@@ -17,23 +17,18 @@ public:
     WaveTableSlotComponent(int slotIndex, float yPosition);
     ~WaveTableSlotComponent() override = default;
     
-    // Configuration
     Config getConfig() const;
     void setConfig(const Config& config);
     
-    // Status management
     void setStatus(const juce::String& message, juce::Colour colour);
     void setLoadedFile(const juce::File& file);
     juce::File getLoadedFile() const { return mLoadedFile; }
     
-    // Callback when user loads a file
     std::function<void(int slotIndex, juce::File file, Config config)> onFileLoaded;
     
-    // Component overrides
     void paint(juce::Graphics& g) override;
     void resized() override;
     
-    // Drag and drop
     bool isInterestedInFileDrag(const juce::StringArray& files) override;
     void filesDropped(const juce::StringArray& files, int x, int y) override;
 
@@ -47,7 +42,6 @@ private:
     juce::File mLoadedFile;
     Config mConfig;
     
-    // UI Components
     juce::Label mBitDepthLabel;
     juce::ComboBox mBitDepthCombo;
     juce::Label mTableSizeLabel;

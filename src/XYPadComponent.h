@@ -26,7 +26,7 @@ private:
     float mYPosition = 0.0f;
     
     void updatePositionFromMouse(const juce::MouseEvent& event);
-    juce::Point<float> getCircleCenter() const;
+    inline juce::Point<float> getCircleCenter() const;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(XYPadComponent)
 };

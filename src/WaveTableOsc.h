@@ -27,6 +27,5 @@ private:
     
     float mFrequency;
     int mSampleRate;
-    float mDelta;
     std::array<WaveTable, NumWaveTableSlots> mOscillators;
 };

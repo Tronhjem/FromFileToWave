@@ -7,10 +7,10 @@ constexpr double twoPi = 6.283185307179586;
 class WaveTable
 {
 public:
-    WaveTable() = default;
+    WaveTable();
     ~WaveTable() = default;
 
-    float getSample(float delta, float xIndex);
+    float getSample(float frequency, int sampleRate, float xIndex);
     
     bool loadWaveTable(const juce::File& file, const WaveTableFileReader::Config& config);
     bool isWaveTableLoaded() const { return mWaveReader.isLoaded(); }
@@ -18,6 +18,7 @@ public:
 
 private:
     inline float lerp(float a, float b, float t);
-
+    float mDelta;
+    
     WaveTableFileReader mWaveReader;
 };

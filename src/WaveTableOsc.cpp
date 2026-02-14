@@ -5,7 +5,6 @@ constexpr float maxTableSize = 2048.f;
 WaveTableOsc::WaveTableOsc(float freq, int sampleRate)
     : mFrequency(freq)
     , mSampleRate(sampleRate)
-    , mDelta(0.0f)
 {
 }
 
@@ -28,18 +27,13 @@ float WaveTableOsc::getNextSample(float xIndex, float yIndex)
     
     if (mOscillators[yFloor].isWaveTableLoaded())
     {
-        sampleLower = mOscillators[yFloor].getSample(mDelta, xIndex);
+        sampleLower = mOscillators[yFloor].getSample(mFrequency, mSampleRate, xIndex);
     }
     
     if (mOscillators[yUpper].isWaveTableLoaded())
     {
-        sampleUpper = mOscillators[yUpper].getSample(mDelta, xIndex);
+        sampleUpper = mOscillators[yUpper].getSample(mFrequency, mSampleRate, xIndex);
     }
-
-    const float phaseIncrement = (mFrequency / static_cast<float>(mSampleRate)) * maxTableSize;
-    mDelta += phaseIncrement;
-    if (mDelta >= maxTableSize)
-        mDelta -= maxTableSize;
 
     return lerp(sampleLower, sampleUpper, yFrac);
 }

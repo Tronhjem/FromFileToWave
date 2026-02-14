@@ -65,7 +65,7 @@ void XYPadComponent::updatePositionFromMouse(const juce::MouseEvent& event)
     
     if (onPositionChanged)
     {
-        onPositionChanged(mXPosition, mYPosition);
+        onPositionChanged(mXPosition, abs(1.f - mYPosition));
     }
 }
 

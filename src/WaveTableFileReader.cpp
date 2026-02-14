@@ -39,14 +39,12 @@ float WaveTableFileReader::convertSampleToFloat(const uint8* bytes, BitDepth bit
         {
             if (isIEEEFloat)
             {
-                // 32-bit IEEE float - just reinterpret the bytes
                 float sample;
                 std::memcpy(&sample, bytes, 4);
                 return sample;
             }
             else
             {
-                // 32-bit integer PCM
                 int32 sample = static_cast<int32>(
                     bytes[0] | (bytes[1] << 8) | (bytes[2] << 16) | (bytes[3] << 24)
                 );

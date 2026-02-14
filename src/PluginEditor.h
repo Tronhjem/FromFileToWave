@@ -30,6 +30,7 @@ private:
     
     juce::Label mFrequencyLabel;
     juce::Slider mFrequencySlider;
+    juce::ToggleButton mDroneModeButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FromFileToWaveAudioProcessorEditor)
 };

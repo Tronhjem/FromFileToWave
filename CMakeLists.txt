@@ -12,11 +12,9 @@ file(GLOB_RECURSE SRC_FILES "src/*.cpp")
 # ===================================================================================================
 juce_add_plugin(FromWaveToFile
     VERSION 0.1
-    # ICON_BIG ...
-    # ICON_SMALL ...
     COMPANY_NAME SonoTron
-    # IS_SYNTH TRUE/FALSE
-    # NEEDS_MIDI_INPUT TRUE/FALSE
+    IS_SYNTH TRUE
+    NEEDS_MIDI_INPUT TRUE
     NEEDS_MIDI_OUTPUT FALSE
     IS_MIDI_EFFECT FALSE
     EDITOR_WANTS_KEYBOARD_FOCUS TRUE

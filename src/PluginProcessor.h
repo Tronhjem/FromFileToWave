@@ -60,7 +60,10 @@ public:
     
     float mXPosition = 0.f;
     float mYPosition = 0.f;
-    float mFrequency = 50.f;
+    float mFrequency = 440.f;
+    bool mDroneMode = true;
+    bool mIsNoteOn = false;
+    
     std::array<int, NumWaveTableSlots> mBitDepth = {16, 16, 16, 16, 16, 16};
     std::array<int, NumWaveTableSlots> mTableSize = {2048, 2048, 2048, 2048, 2048, 2048};
     std::array<int, NumWaveTableSlots> mNumTables = {1, 1, 1, 1, 1, 1};
@@ -68,7 +71,13 @@ public:
 
 private:
     double mSampleRate;
+    bool mWasDroneMode;
     WaveTableOsc mWaveTableOsc;
+    
+    int mCurrentNote = -1;
+    
+    void processMidiMessage(const juce::MidiMessage& message);
+    float noteToFrequency(int midiNote) const;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FromFileToWaveAudioProcessor)

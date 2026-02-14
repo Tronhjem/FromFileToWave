@@ -37,6 +37,18 @@ FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFile
     addAndMakeVisible(mFrequencyLabel);
     addAndMakeVisible(mFrequencySlider);
     
+    mDroneModeButton.setButtonText("Drone");
+    mDroneModeButton.setToggleState(audioProcessor.mDroneMode, juce::dontSendNotification);
+    mDroneModeButton.onClick = [this]()
+    {
+        audioProcessor.mDroneMode = mDroneModeButton.getToggleState();
+        if (audioProcessor.mDroneMode)
+        {
+            audioProcessor.mIsNoteOn = true;
+        }
+    };
+    addAndMakeVisible(mDroneModeButton);
+    
     for (int i = 0; i < NumWaveTableSlots; ++i)
     {
         auto* slot = mSlots.add(new WaveTableSlotComponent(i, YPositions[i]));
@@ -119,7 +131,9 @@ void FromFileToWaveAudioProcessorEditor::resized()
     leftSection.removeFromTop(margin);
     auto freqRow = leftSection.removeFromTop(rowHeight);
     mFrequencyLabel.setBounds(freqRow.removeFromLeft(120));
-    mFrequencySlider.setBounds(freqRow);
+    mFrequencySlider.setBounds(freqRow.removeFromLeft(freqRow.getWidth() - 80));
+    freqRow.removeFromLeft(5);
+    mDroneModeButton.setBounds(freqRow);
     
     bounds.removeFromLeft(margin);
     

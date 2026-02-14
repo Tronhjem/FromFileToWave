@@ -21,7 +21,7 @@ FromFileToWaveAudioProcessor::FromFileToWaveAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ), mWaveTableOsc(50, 48000)
+                       ), mWasDroneMode(false), mWaveTableOsc(440, 48000)
 #endif
 {
 }
@@ -138,13 +138,29 @@ bool FromFileToWaveAudioProcessor::isBusesLayoutSupported (const BusesLayout& la
 void FromFileToWaveAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
-    UNUSED(midiMessages);
-
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
     
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
+    
+    if (!mDroneMode)
+    {
+        if (mWasDroneMode)
+        {
+            mWasDroneMode = false;
+            mIsNoteOn = false;
+        }
+        
+        for (const auto metadata : midiMessages)
+        {
+            processMidiMessage(metadata.getMessage());
+        }
+    }
+    else
+    {
+        mWasDroneMode = true;
+    }
     
     mWaveTableOsc.setFrequency(mFrequency, static_cast<int>(mSampleRate));
     
@@ -152,13 +168,41 @@ void FromFileToWaveAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     
     for (int sample = 0; sample < numSamples; ++sample)
     {
-        const float outputSample = mWaveTableOsc.getNextSample(mXPosition, mYPosition);
+        float outputSample = 0.0f;
+        
+        if (mIsNoteOn || mDroneMode)
+        {
+            outputSample = mWaveTableOsc.getNextSample(mXPosition, mYPosition);
+        }
         
         for (int channel = 0; channel < totalNumOutputChannels; ++channel)
         {
             buffer.setSample(channel, sample, outputSample);
         }
     }
+}
+
+void FromFileToWaveAudioProcessor::processMidiMessage(const juce::MidiMessage& message)
+{
+    if (message.isNoteOn())
+    {
+        mCurrentNote = message.getNoteNumber();
+        mFrequency = noteToFrequency(mCurrentNote);
+        mIsNoteOn = true;
+    }
+    else if (message.isNoteOff())
+    {
+        if (message.getNoteNumber() == mCurrentNote)
+        {
+            mIsNoteOn = false;
+            mCurrentNote = -1;
+        }
+    }
+}
+
+float FromFileToWaveAudioProcessor::noteToFrequency(int midiNote) const
+{
+    return 440.0f * std::pow(2.0f, (static_cast<float>(midiNote) - 69.f) / 12.0f);
 }
 
 bool FromFileToWaveAudioProcessor::loadWaveTableFile(int slot, const juce::File& file, const WaveTableFileReader::Config& config)
@@ -195,6 +239,7 @@ void FromFileToWaveAudioProcessor::getStateInformation (juce::MemoryBlock& destD
     xml.setAttribute("xPosition", mXPosition);
     xml.setAttribute("yPosition", mYPosition);
     xml.setAttribute("frequency", mFrequency);
+    xml.setAttribute("droneMode", mDroneMode);
     
     for (int i = 0; i < NumWaveTableSlots; ++i)
     {
@@ -217,7 +262,8 @@ void FromFileToWaveAudioProcessor::setStateInformation (const void* data, int si
         {
             mXPosition = static_cast<float>(xml->getDoubleAttribute("xPosition", 0.0));
             mYPosition = static_cast<float>(xml->getDoubleAttribute("yPosition", 0.0));
-            mFrequency = static_cast<float>(xml->getDoubleAttribute("frequency", 50.0));
+            mFrequency = static_cast<float>(xml->getDoubleAttribute("frequency", 440.0));
+            mDroneMode = xml->getBoolAttribute("droneMode", true);
             
             for (int i = 0; i < NumWaveTableSlots; ++i)
             {

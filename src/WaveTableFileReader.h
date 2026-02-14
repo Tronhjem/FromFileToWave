@@ -2,7 +2,7 @@
 
 #include <JuceHeader.h>
 #include <vector>
-
+#include <atomic>
 
 class WaveTableFileReader
 {
@@ -31,7 +31,7 @@ public:
     //TODO: Not thread safe, implement a pointer swap and lock.
     const std::vector<std::vector<float>>& getWaveTables() const { return mWaveTables; }
     
-    bool isLoaded() const { return !mWaveTables.empty(); }
+    bool isLoaded() const { return mIsLoaded.load(); }
     
     juce::String getLastError() const { return mLastError; }
     
@@ -57,4 +57,5 @@ private:
     bool parseWavHeader(juce::FileInputStream& stream, WavHeader& header);
     bool loadWavFile(juce::FileInputStream& stream, const WavHeader& header, const Config& config);
     bool loadRawFile(juce::FileInputStream& stream, const Config& config);
+    std::atomic<bool> mIsLoaded = false;
 };

@@ -272,6 +272,7 @@ bool WaveTableFileReader::loadFile(const juce::File& file, const Config& config)
     //TODO: Not thread safe, implement a pointer swap and lock.
     mWaveTables.clear();
     mLastError.clear();
+    mIsLoaded = false;
 
     if (!file.existsAsFile())
     {
@@ -302,7 +303,10 @@ bool WaveTableFileReader::loadFile(const juce::File& file, const Config& config)
     }
     
     if (success)
+    {
         mLastConfig = config;
-    
+        mIsLoaded = true;
+    }
+
     return success;
 }

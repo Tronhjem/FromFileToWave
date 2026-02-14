@@ -24,8 +24,9 @@ float WaveTable::getSample(float delta, float xIndex)
     WaveTableFileReader::Config waveConfig = mWaveReader.getConfig();
     const int maxTableIndex = waveConfig.numTables - 1;
     const int tableSizeMask = waveConfig.tableSize - 1;
-    
+
 #if _DEBUG
+    const int tableSize = waveConfig.tableSize;
     assert((tableSize > 0) && ((tableSize & (tableSize - 1)) == 0) && "n must be a power of two");
 #endif
 
@@ -33,7 +34,7 @@ float WaveTable::getSample(float delta, float xIndex)
     const int tableFloorIndex = static_cast<int>(floor(tableIndex));
     const int tableUpperIndex = std::min(tableFloorIndex + 1, maxTableIndex);
 
-    const int deltaFloor = static_cast<int>(floor(delta));
+    const int deltaFloor = static_cast<int>(floor(delta)) & tableSizeMask;
     const int deltaUpper = (deltaFloor + 1) & tableSizeMask;
     
     const float floorA = tables[static_cast<size_t>(tableFloorIndex)][static_cast<size_t>(deltaFloor)];

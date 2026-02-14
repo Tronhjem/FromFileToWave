@@ -1,5 +1,6 @@
 
 #include "WaveTableOsc.h"
+constexpr float maxTableSize = 2048.f;
 
 WaveTableOsc::WaveTableOsc(float freq, int sampleRate)
     : mFrequency(freq)
@@ -35,10 +36,10 @@ float WaveTableOsc::getNextSample(float xIndex, float yIndex)
         sampleUpper = mOscillators[yUpper].getSample(mDelta, xIndex);
     }
 
-    const float phaseIncrement = (mFrequency / static_cast<float>(mSampleRate)) * 2048.0f;
+    const float phaseIncrement = (mFrequency / static_cast<float>(mSampleRate)) * maxTableSize;
     mDelta += phaseIncrement;
-    if (mDelta >= 2048.0f)
-        mDelta -= 2048.0f;
+    if (mDelta >= maxTableSize)
+        mDelta -= maxTableSize;
 
     return lerp(sampleLower, sampleUpper, yFrac);
 }

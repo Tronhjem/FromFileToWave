@@ -48,7 +48,7 @@ FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFile
         config.smoothAmount = audioProcessor.mSmooth[static_cast<size_t>(i)];
         slot->setConfig(config);
         
-        slot->onFileLoaded = [this](int slotIndex, juce::File file, WaveTableSlotComponent::Config cfg)
+        slot->onFileLoaded = [this](const int slotIndex, juce::File file, WaveTableSlotComponent::Config cfg)
         {
             handleFileLoaded(slotIndex, file, cfg);
         };

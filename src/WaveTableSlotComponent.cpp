@@ -55,10 +55,14 @@ WaveTableSlotComponent::WaveTableSlotComponent(int slotIndex, float yPosition)
     mSmoothSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, 20);
     mSmoothSlider.setRange(0.0, 1.0, 0.01);
     mSmoothSlider.setValue(0.0);
+
     mSmoothSlider.onValueChange = [this]() {
         handleSmoothChange();
+    };
+    mSmoothSlider.onDragEnd = [this]() {
         tryReload();
     };
+
     addAndMakeVisible(mSmoothSlider);
     
     mStatusLabel.setText("Drop file here", juce::dontSendNotification);

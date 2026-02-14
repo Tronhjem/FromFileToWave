@@ -302,9 +302,27 @@ bool WaveTableFileReader::loadFile(const juce::File& file, const Config& config)
     
     if (success)
     {
+        for (auto& table : mWaveTables)
+        {
+            applyLowpassFilter(table, config.smoothAmount);
+        }
+        
         mLastConfig = config;
         mIsLoaded = true;
     }
 
     return success;
+}
+
+void WaveTableFileReader::applyLowpassFilter(std::vector<float>& table, float smoothAmount)
+{
+    if (smoothAmount <= 0.0f || table.empty())
+        return;
+    
+    float y = table[0];
+    for (size_t i = 0; i < table.size(); ++i)
+    {
+        y = y + smoothAmount * (table[i] - y);
+        table[i] = y;
+    }
 }

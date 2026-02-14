@@ -13,7 +13,10 @@ WaveTableSlotComponent::WaveTableSlotComponent(int slotIndex, float yPosition)
     mBitDepthCombo.addItem("24", 3);
     mBitDepthCombo.addItem("32", 4);
     mBitDepthCombo.setSelectedId(2);
-    mBitDepthCombo.onChange = [this]() { handleBitDepthChange(); };
+    mBitDepthCombo.onChange = [this]() { 
+        handleBitDepthChange(); 
+        tryReload();
+    };
     addAndMakeVisible(mBitDepthCombo);
     
     mTableSizeLabel.setText("Size:", juce::dontSendNotification);
@@ -26,7 +29,10 @@ WaveTableSlotComponent::WaveTableSlotComponent(int slotIndex, float yPosition)
     mTableSizeCombo.addItem("4096", 4);
     mTableSizeCombo.addItem("8192", 5);
     mTableSizeCombo.setSelectedId(3);
-    mTableSizeCombo.onChange = [this]() { handleTableSizeChange(); };
+    mTableSizeCombo.onChange = [this]() { 
+        handleTableSizeChange(); 
+        tryReload();
+    };
     addAndMakeVisible(mTableSizeCombo);
     
     mNumTablesLabel.setText("Num:", juce::dontSendNotification);
@@ -35,7 +41,25 @@ WaveTableSlotComponent::WaveTableSlotComponent(int slotIndex, float yPosition)
     
     mNumTablesEditor.setText("1");
     mNumTablesEditor.setInputRestrictions(3, "0123456789");
+    mNumTablesEditor.onTextChange = [this]() {
+        handleNumTablesChange();
+        tryReload();
+    };
     addAndMakeVisible(mNumTablesEditor);
+    
+    mSmoothLabel.setText("Sm:", juce::dontSendNotification);
+    mSmoothLabel.setJustificationType(juce::Justification::centredRight);
+    addAndMakeVisible(mSmoothLabel);
+    
+    mSmoothSlider.setSliderStyle(juce::Slider::LinearBarVertical);
+    mSmoothSlider.setTextBoxStyle(juce::Slider::TextBoxBelow, false, 50, 20);
+    mSmoothSlider.setRange(0.0, 1.0, 0.01);
+    mSmoothSlider.setValue(0.0);
+    mSmoothSlider.onValueChange = [this]() {
+        handleSmoothChange();
+        tryReload();
+    };
+    addAndMakeVisible(mSmoothSlider);
     
     mStatusLabel.setText("Drop file here", juce::dontSendNotification);
     mStatusLabel.setJustificationType(juce::Justification::centred);
@@ -72,6 +96,9 @@ void WaveTableSlotComponent::resized()
     configRow.removeFromLeft(5);
     mNumTablesLabel.setBounds(configRow.removeFromLeft(labelWidth));
     mNumTablesEditor.setBounds(configRow.removeFromLeft(comboWidth));
+    configRow.removeFromLeft(5);
+    mSmoothLabel.setBounds(configRow.removeFromLeft(labelWidth));
+    mSmoothSlider.setBounds(configRow.removeFromLeft(50));
     
     bounds.removeFromTop(margin);
     
@@ -111,6 +138,14 @@ void WaveTableSlotComponent::loadFile(const juce::File& file)
     }
 }
 
+void WaveTableSlotComponent::tryReload()
+{
+    if (mLoadedFile.exists())
+    {
+        loadFile(mLoadedFile);
+    }
+}
+
 void WaveTableSlotComponent::handleBitDepthChange()
 {
     int selectedId = mBitDepthCombo.getSelectedId();
@@ -136,6 +171,20 @@ void WaveTableSlotComponent::handleTableSizeChange()
         case 5: mConfig.tableSize = 8192; break;
         default: mConfig.tableSize = 2048; break;
     }
+}
+
+void WaveTableSlotComponent::handleNumTablesChange()
+{
+    int numTables = mNumTablesEditor.getText().getIntValue();
+    if (numTables >= 1 && numTables <= 999)
+    {
+        mConfig.numTables = numTables;
+    }
+}
+
+void WaveTableSlotComponent::handleSmoothChange()
+{
+    mConfig.smoothAmount = static_cast<float>(mSmoothSlider.getValue());
 }
 
 WaveTableSlotComponent::Config WaveTableSlotComponent::getConfig() const
@@ -167,6 +216,7 @@ void WaveTableSlotComponent::setConfig(const Config& config)
     }
     
     mNumTablesEditor.setText(juce::String(config.numTables));
+    mSmoothSlider.setValue(config.smoothAmount, juce::dontSendNotification);
 }
 
 void WaveTableSlotComponent::setStatus(const juce::String& message, juce::Colour colour)

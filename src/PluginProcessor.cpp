@@ -193,6 +193,7 @@ void FromFileToWaveAudioProcessor::getStateInformation (juce::MemoryBlock& destD
         xml.setAttribute("bitDepth" + juce::String(i), mBitDepth[i]);
         xml.setAttribute("tableSize" + juce::String(i), mTableSize[i]);
         xml.setAttribute("numTables" + juce::String(i), mNumTables[i]);
+        xml.setAttribute("smooth" + juce::String(i), static_cast<double>(mSmooth[i]));
     }
     
     copyXmlToBinary(xml, destData);
@@ -215,6 +216,7 @@ void FromFileToWaveAudioProcessor::setStateInformation (const void* data, int si
                 mBitDepth[i] = xml->getIntAttribute("bitDepth" + juce::String(i), 16);
                 mTableSize[i] = xml->getIntAttribute("tableSize" + juce::String(i), 2048);
                 mNumTables[i] = xml->getIntAttribute("numTables" + juce::String(i), 1);
+                mSmooth[i] = static_cast<float>(xml->getDoubleAttribute("smooth" + juce::String(i), 0.0));
             }
         }
     }

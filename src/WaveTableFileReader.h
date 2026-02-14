@@ -20,6 +20,7 @@ public:
         BitDepth bitDepth = BitDepth::Bit16;
         int tableSize = 2048;
         int numTables = 1;
+        float smoothAmount = 0.0f;
     };
     
     WaveTableFileReader() = default;
@@ -57,5 +58,6 @@ private:
     bool parseWavHeader(juce::FileInputStream& stream, WavHeader& header);
     bool loadWavFile(juce::FileInputStream& stream, const WavHeader& header, const Config& config);
     bool loadRawFile(juce::FileInputStream& stream, const Config& config);
+    void applyLowpassFilter(std::vector<float>& table, float smoothAmount);
     std::atomic<bool> mIsLoaded = false;
 };

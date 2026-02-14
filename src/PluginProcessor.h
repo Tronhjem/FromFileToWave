@@ -64,6 +64,7 @@ public:
     std::array<int, NumWaveTableSlots> mBitDepth = {16, 16, 16, 16, 16, 16};
     std::array<int, NumWaveTableSlots> mTableSize = {2048, 2048, 2048, 2048, 2048, 2048};
     std::array<int, NumWaveTableSlots> mNumTables = {1, 1, 1, 1, 1, 1};
+    std::array<float, NumWaveTableSlots> mSmooth = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
 private:
     double mSampleRate;

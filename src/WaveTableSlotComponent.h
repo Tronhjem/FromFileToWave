@@ -12,6 +12,7 @@ public:
         int bitDepth = 16;
         int tableSize = 2048;
         int numTables = 1;
+        float smoothAmount = 0.0f;
     };
     
     WaveTableSlotComponent(int slotIndex, float yPosition);
@@ -34,8 +35,11 @@ public:
 
 private:
     void loadFile(const juce::File& file);
+    void tryReload();
     void handleBitDepthChange();
     void handleTableSizeChange();
+    void handleNumTablesChange();
+    void handleSmoothChange();
     
     int mSlotIndex;
     float mYPosition;
@@ -48,6 +52,8 @@ private:
     juce::ComboBox mTableSizeCombo;
     juce::Label mNumTablesLabel;
     juce::TextEditor mNumTablesEditor;
+    juce::Label mSmoothLabel;
+    juce::Slider mSmoothSlider;
     juce::Label mStatusLabel;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaveTableSlotComponent)

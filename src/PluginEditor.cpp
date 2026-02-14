@@ -17,7 +17,7 @@ constexpr float YPositions[NumWaveTableSlots] = {0.0f, 0.2f, 0.4f, 0.6f, 0.8f, 1
 FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFileToWaveAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    setSize(1000, 700);
+    setSize(1200, 700);
 
     addAndMakeVisible(mXYPad);
     mXYPad.setPosition(audioProcessor.mXPosition, audioProcessor.mYPosition);
@@ -45,6 +45,7 @@ FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFile
         config.bitDepth = audioProcessor.mBitDepth[static_cast<size_t>(i)];
         config.tableSize = audioProcessor.mTableSize[static_cast<size_t>(i)];
         config.numTables = audioProcessor.mNumTables[static_cast<size_t>(i)];
+        config.smoothAmount = audioProcessor.mSmooth[static_cast<size_t>(i)];
         slot->setConfig(config);
         
         slot->onFileLoaded = [this](int slotIndex, juce::File file, WaveTableSlotComponent::Config cfg)
@@ -75,9 +76,10 @@ void FromFileToWaveAudioProcessorEditor::handleFileLoaded(int slotIndex, juce::F
     audioProcessor.mBitDepth[static_cast<size_t>(slotIndex)] = config.bitDepth;
     audioProcessor.mTableSize[static_cast<size_t>(slotIndex)] = config.tableSize;
     audioProcessor.mNumTables[static_cast<size_t>(slotIndex)] = config.numTables;
+    audioProcessor.mSmooth[static_cast<size_t>(slotIndex)] = config.smoothAmount;
     
     WaveTableFileReader::BitDepth bitDepth = static_cast<WaveTableFileReader::BitDepth>(config.bitDepth);
-    WaveTableFileReader::Config readerConfig{bitDepth, config.tableSize, config.numTables};
+    WaveTableFileReader::Config readerConfig{bitDepth, config.tableSize, config.numTables, config.smoothAmount};
     
     bool success = audioProcessor.loadWaveTableFile(slotIndex, file, readerConfig);
     

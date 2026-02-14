@@ -1,6 +1,5 @@
 
 #include "WaveTableOsc.h"
-constexpr float maxTableSize = 2048.f;
 
 WaveTableOsc::WaveTableOsc(float freq, int sampleRate)
     : mFrequency(freq)

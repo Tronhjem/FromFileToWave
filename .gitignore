@@ -2,6 +2,7 @@
 build/
 Builds/
 JuceLibraryCode/
+.github/
 .cache/
 *.wav
 *.png

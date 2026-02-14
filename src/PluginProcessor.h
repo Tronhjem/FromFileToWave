@@ -9,7 +9,9 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "Envelope.h"
 #include "WaveTableOsc.h"
+#include "Envelope.h"
 
 //==============================================================================
 /**
@@ -61,13 +63,15 @@ public:
     float mXPosition = 0.f;
     float mYPosition = 0.f;
     float mFrequency = 440.f;
-    bool mDroneMode = true;
+    bool mDroneMode = false;
     bool mIsNoteOn = false;
     
     std::array<int, NumWaveTableSlots> mBitDepth = {16, 16, 16, 16, 16, 16};
     std::array<int, NumWaveTableSlots> mTableSize = {2048, 2048, 2048, 2048, 2048, 2048};
     std::array<int, NumWaveTableSlots> mNumTables = {1, 1, 1, 1, 1, 1};
     std::array<float, NumWaveTableSlots> mSmooth = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
+
+    Envelope mEnvelope;
 
 private:
     double mSampleRate;

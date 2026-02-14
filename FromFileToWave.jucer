@@ -3,6 +3,9 @@
 <JUCERPROJECT id="TKT4zb" name="FromFileToWave" projectType="audioplug" useAppConfig="0"
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="u7VcD8" name="FromFileToWave">
+    <FILE id="EhClyG" name="Defines.h" compile="0" resource="0" file="src/Defines.h"/>
+    <FILE id="fIPnDH" name="Envelope.cpp" compile="1" resource="0" file="src/Envelope.cpp"/>
+    <FILE id="fsTEkE" name="Envelope.h" compile="0" resource="0" file="src/Envelope.h"/>
     <FILE id="sY3sMc" name="PluginEditor.cpp" compile="1" resource="0"
           file="src/PluginEditor.cpp"/>
     <FILE id="LmNPTD" name="PluginEditor.h" compile="0" resource="0" file="src/PluginEditor.h"/>

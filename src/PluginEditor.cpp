@@ -6,6 +6,7 @@
   ==============================================================================
 */
 
+#include "Envelope.h"
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
@@ -45,9 +46,36 @@ FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFile
         if (audioProcessor.mDroneMode)
         {
             audioProcessor.mIsNoteOn = true;
+            audioProcessor.mEnvelope.setState(EnvelopeState::Attack);
+        }
+        else
+        {
+            audioProcessor.mEnvelope.setState(EnvelopeState::Release);
         }
     };
     addAndMakeVisible(mDroneModeButton);
+    
+    mAttackLabel.setText("A:", juce::dontSendNotification);
+    mAttackLabel.setJustificationType(juce::Justification::centredLeft);
+    mAttackSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+    mAttackSlider.setRange(0.0, 2000.0, 0.1);
+    mAttackSlider.setValue(audioProcessor.mEnvelope.getAttack());
+    mAttackSlider.setTextBoxStyle(juce::Slider::TextBoxRight, false, 50, 20);
+    mAttackSlider.setTextValueSuffix("ms");
+    mAttackSlider.addListener(this);
+    addAndMakeVisible(mAttackLabel);
+    addAndMakeVisible(mAttackSlider);
+    
+    mReleaseLabel.setText("R:", juce::dontSendNotification);
+    mReleaseLabel.setJustificationType(juce::Justification::centredLeft);
+    mReleaseSlider.setSliderStyle(juce::Slider::LinearHorizontal);
+    mReleaseSlider.setRange(0.0, 2000.0, 0.1);
+    mReleaseSlider.setValue(audioProcessor.mEnvelope.getRelease());
+    mReleaseSlider.setTextBoxStyle(juce::Slider::TextBoxRight, false, 50, 20);
+    mReleaseSlider.setTextValueSuffix("ms");
+    mReleaseSlider.addListener(this);
+    addAndMakeVisible(mReleaseLabel);
+    addAndMakeVisible(mReleaseSlider);
     
     for (int i = 0; i < NumWaveTableSlots; ++i)
     {
@@ -80,6 +108,14 @@ void FromFileToWaveAudioProcessorEditor::sliderValueChanged(juce::Slider* slider
     if (slider == &mFrequencySlider)
     {
         audioProcessor.mFrequency = static_cast<float>(slider->getValue());
+    }
+    else if (slider == &mAttackSlider)
+    {
+        audioProcessor.mEnvelope.setAttack(static_cast<float>(slider->getValue()));
+    }
+    else if (slider == &mReleaseSlider)
+    {
+        audioProcessor.mEnvelope.setRelease(static_cast<float>(slider->getValue()));
     }
 }
 
@@ -134,6 +170,14 @@ void FromFileToWaveAudioProcessorEditor::resized()
     mFrequencySlider.setBounds(freqRow.removeFromLeft(freqRow.getWidth() - 80));
     freqRow.removeFromLeft(5);
     mDroneModeButton.setBounds(freqRow);
+    
+    leftSection.removeFromTop(margin);
+    auto envRow = leftSection.removeFromTop(rowHeight);
+    mAttackLabel.setBounds(envRow.removeFromLeft(20));
+    mAttackSlider.setBounds(envRow.removeFromLeft(150));
+    envRow.removeFromLeft(10);
+    mReleaseLabel.setBounds(envRow.removeFromLeft(20));
+    mReleaseSlider.setBounds(envRow.removeFromLeft(150));
     
     bounds.removeFromLeft(margin);
     

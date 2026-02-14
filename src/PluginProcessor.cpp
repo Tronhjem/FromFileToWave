@@ -7,6 +7,7 @@
 */
 
 #include "PluginProcessor.h"
+#include "Envelope.h"
 #include "PluginEditor.h"
 #include "WaveTableFileReader.h"
 #include "Defines.h"
@@ -101,6 +102,7 @@ void FromFileToWaveAudioProcessor::prepareToPlay (double sampleRate, int samples
 {
     UNUSED(samplesPerBlock);
     mSampleRate = sampleRate;
+    mEnvelope.updateEnvelopeIncrements(static_cast<float>(mSampleRate));
 }
 
 void FromFileToWaveAudioProcessor::releaseResources()
@@ -150,6 +152,7 @@ void FromFileToWaveAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
         {
             mWasDroneMode = false;
             mIsNoteOn = false;
+            // mEnvelope.setState(EnvelopeState::Release);
         }
         
         for (const auto metadata : midiMessages)
@@ -157,9 +160,10 @@ void FromFileToWaveAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
             processMidiMessage(metadata.getMessage());
         }
     }
-    else
+    else if (!mWasDroneMode)
     {
         mWasDroneMode = true;
+        // mEnvelope.setState(EnvelopeState::Attack);
     }
     
     mWaveTableOsc.setFrequency(mFrequency, static_cast<int>(mSampleRate));
@@ -168,12 +172,11 @@ void FromFileToWaveAudioProcessor::processBlock (juce::AudioBuffer<float>& buffe
     
     for (int sample = 0; sample < numSamples; ++sample)
     {
+        const float envelopeLevel = mEnvelope.updateEnvelope();
         float outputSample = 0.0f;
         
-        if (mIsNoteOn || mDroneMode)
-        {
-            outputSample = mWaveTableOsc.getNextSample(mXPosition, mYPosition);
-        }
+        outputSample = mWaveTableOsc.getNextSample(mXPosition, mYPosition);
+        outputSample *= envelopeLevel;
         
         for (int channel = 0; channel < totalNumOutputChannels; ++channel)
         {
@@ -189,6 +192,7 @@ void FromFileToWaveAudioProcessor::processMidiMessage(const juce::MidiMessage& m
         mCurrentNote = message.getNoteNumber();
         mFrequency = noteToFrequency(mCurrentNote);
         mIsNoteOn = true;
+        mEnvelope.setState(EnvelopeState::Attack);
     }
     else if (message.isNoteOff())
     {
@@ -196,6 +200,7 @@ void FromFileToWaveAudioProcessor::processMidiMessage(const juce::MidiMessage& m
         {
             mIsNoteOn = false;
             mCurrentNote = -1;
+            mEnvelope.setState(EnvelopeState::Release);
         }
     }
 }
@@ -240,6 +245,8 @@ void FromFileToWaveAudioProcessor::getStateInformation (juce::MemoryBlock& destD
     xml.setAttribute("yPosition", mYPosition);
     xml.setAttribute("frequency", mFrequency);
     xml.setAttribute("droneMode", mDroneMode);
+    xml.setAttribute("attackTimeMs", static_cast<double>(mEnvelope.getAttack()));
+    xml.setAttribute("releaseTimeMs", static_cast<double>(mEnvelope.getRelease()));
     
     for (int i = 0; i < NumWaveTableSlots; ++i)
     {
@@ -264,6 +271,10 @@ void FromFileToWaveAudioProcessor::setStateInformation (const void* data, int si
             mYPosition = static_cast<float>(xml->getDoubleAttribute("yPosition", 0.0));
             mFrequency = static_cast<float>(xml->getDoubleAttribute("frequency", 440.0));
             mDroneMode = xml->getBoolAttribute("droneMode", true);
+            mEnvelope.setAttack(static_cast<float>(xml->getDoubleAttribute("attackTimeMs", 2.0)));
+            mEnvelope.setRelease(static_cast<float>(xml->getDoubleAttribute("releaseTimeMs", 50.0)));
+            
+            mEnvelope.updateEnvelopeIncrements(static_cast<float>(mSampleRate));
             
             for (int i = 0; i < NumWaveTableSlots; ++i)
             {

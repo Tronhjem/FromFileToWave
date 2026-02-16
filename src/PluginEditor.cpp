@@ -58,7 +58,7 @@ FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFile
     mAttackLabel.setJustificationType(juce::Justification::centredLeft);
     mAttackSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     mAttackSlider.setRange(0.0, 2000.0, 0.1);
-    mAttackSlider.setValue(audioProcessor.mEnvelope.getAttack());
+    mAttackSlider.setValue(audioProcessor.mEnvelope.getAttackTime());
     mAttackSlider.setTextBoxStyle(juce::Slider::TextBoxRight, false, 50, 20);
     mAttackSlider.setTextValueSuffix("ms");
     mAttackSlider.addListener(this);
@@ -69,7 +69,7 @@ FromFileToWaveAudioProcessorEditor::FromFileToWaveAudioProcessorEditor (FromFile
     mReleaseLabel.setJustificationType(juce::Justification::centredLeft);
     mReleaseSlider.setSliderStyle(juce::Slider::LinearHorizontal);
     mReleaseSlider.setRange(0.0, 2000.0, 0.1);
-    mReleaseSlider.setValue(audioProcessor.mEnvelope.getRelease());
+    mReleaseSlider.setValue(audioProcessor.mEnvelope.getReleaseTime());
     mReleaseSlider.setTextBoxStyle(juce::Slider::TextBoxRight, false, 50, 20);
     mReleaseSlider.setTextValueSuffix("ms");
     mReleaseSlider.addListener(this);
@@ -110,11 +110,11 @@ void FromFileToWaveAudioProcessorEditor::sliderValueChanged(juce::Slider* slider
     }
     else if (slider == &mAttackSlider)
     {
-        audioProcessor.mEnvelope.setAttack(static_cast<float>(slider->getValue()));
+        audioProcessor.mEnvelope.setAttackTime(static_cast<float>(slider->getValue()));
     }
     else if (slider == &mReleaseSlider)
     {
-        audioProcessor.mEnvelope.setRelease(static_cast<float>(slider->getValue()));
+        audioProcessor.mEnvelope.setReleaseTime(static_cast<float>(slider->getValue()));
     }
 }
 

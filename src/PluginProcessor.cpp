@@ -230,8 +230,8 @@ void FromFileToWaveAudioProcessor::getStateInformation (juce::MemoryBlock& destD
     xml.setAttribute("yPosition", mYPosition);
     xml.setAttribute("frequency", mFrequency);
     xml.setAttribute("droneMode", mDroneMode);
-    xml.setAttribute("attackTimeMs", static_cast<double>(mEnvelope.getAttack()));
-    xml.setAttribute("releaseTimeMs", static_cast<double>(mEnvelope.getRelease()));
+    xml.setAttribute("attackTimeMs", static_cast<double>(mEnvelope.getAttackTime()));
+    xml.setAttribute("releaseTimeMs", static_cast<double>(mEnvelope.getReleaseTime()));
     
     for (int i = 0; i < NumWaveTableSlots; ++i)
     {
@@ -256,8 +256,8 @@ void FromFileToWaveAudioProcessor::setStateInformation (const void* data, int si
             mYPosition = static_cast<float>(xml->getDoubleAttribute("yPosition", 0.0));
             mFrequency = static_cast<float>(xml->getDoubleAttribute("frequency", 440.0));
             mDroneMode = xml->getBoolAttribute("droneMode", true);
-            mEnvelope.setAttack(static_cast<float>(xml->getDoubleAttribute("attackTimeMs", 2.0)));
-            mEnvelope.setRelease(static_cast<float>(xml->getDoubleAttribute("releaseTimeMs", 50.0)));
+            mEnvelope.setAttackTime(static_cast<float>(xml->getDoubleAttribute("attackTimeMs", 2.0)));
+            mEnvelope.setReleaseTime(static_cast<float>(xml->getDoubleAttribute("releaseTimeMs", 50.0)));
             
             mEnvelope.updateEnvelopeIncrements(static_cast<float>(mSampleRate));
             

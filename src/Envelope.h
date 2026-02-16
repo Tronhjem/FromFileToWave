@@ -12,23 +12,17 @@ public:
 
     void setState(const EnvelopeState state) { mEnvelopeState = state; }
 
-    void setAttack(const float attack)
-    { 
-        mAttackTimeMs = attack;
-        updateEnvelopeIncrements(mSampleRate);
-    }
+    void setAttackTime(const float attack);
+    void setReleaseTime(const float release);
 
-    void setRelease(const float release) 
-    { 
-        mReleaseTimeMs = release;
-        updateEnvelopeIncrements(mSampleRate);
-    }
-
-    float getAttack() { return mAttackTimeMs; }
-    float getRelease() { return mReleaseTimeMs; }
+    float getAttackTime() { return mAttackTimeMs; }
+    float getReleaseTime() { return mReleaseTimeMs; }
     EnvelopeState getState() { return mEnvelopeState; }
 
 private:
+    inline void updateAttackIncrement();
+    inline void updateReleaseIncrement();
+
     float mAttackIncrement = 0.f;
     float mReleaseIncrement = 0.f;
     float mEnvelopeLevel = 0.f;

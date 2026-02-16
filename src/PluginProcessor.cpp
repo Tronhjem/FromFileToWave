@@ -23,7 +23,7 @@ FromFileToWaveAudioProcessor::FromFileToWaveAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       ), mWasDroneMode(false), mWaveTableOsc(440, 48000)
+                       ), mWaveTableOsc(440, 48000)
 #endif
 {
 }
@@ -141,11 +141,7 @@ bool FromFileToWaveAudioProcessor::isBusesLayoutSupported (const BusesLayout& la
 void FromFileToWaveAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
-    
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
     
     if (!mDroneMode)
     {
